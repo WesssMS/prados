@@ -3,7 +3,7 @@
  * Plugin Name: Woo Product Add-ons
  * Plugin URI: https://woocommerce.com/products/product-add-ons/
  * Description: Add extra options to products which your customers can select from, when adding to the cart, with an optional fee for each extra option. Add-ons can be checkboxes, a select box, or custom text input.
- * Version: 6.8.4
+ * Version: 6.9.0
  * Author: Woo
  * Author URI: https://woocommerce.com
  *
@@ -13,7 +13,7 @@
  * Tested up to: 6.5
  *
  * WC requires at least: 3.9
- * WC tested up to: 8.9
+ * WC tested up to: 9.0
  *
  * Requires Plugins: woocommerce
  *
@@ -105,7 +105,7 @@ function woocommerce_product_addons_init() {
 
 	if ( ! class_exists( 'WC_Product_Addons' ) ) :
 
-		define( 'WC_PRODUCT_ADDONS_VERSION', '6.8.4' ); // WRCS: DEFINED_VERSION.
+		define( 'WC_PRODUCT_ADDONS_VERSION', '6.9.0' ); // WRCS: DEFINED_VERSION.
 		define( 'WC_PRODUCT_ADDONS_MAIN_FILE', __FILE__ );
 		define( 'WC_PRODUCT_ADDONS_PLUGIN_URL', untrailingslashit( plugins_url( '/', __FILE__ ) ) );
 		define( 'WC_PRODUCT_ADDONS_PLUGIN_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
@@ -115,7 +115,7 @@ function woocommerce_product_addons_init() {
 		 */
 		class WC_Product_Addons {
 			/**
-			 * Groups controller instance.
+			 * Groups controller instance (legacy).
 			 *
 			 * @var WC_Product_Add_Ons_Groups_Controller
 			 */
@@ -148,7 +148,7 @@ function woocommerce_product_addons_init() {
 				$this->init();
 				add_action( 'init', array( $this, 'init_post_types' ), 20 );
 				add_action( 'init', array( 'WC_Product_Addons_install', 'init' ) );
-				add_action( 'rest_api_init', array( $this, 'rest_api_init' ) );
+				add_action( 'rest_api_init', array( $this, 'rest_api_init' ), 0 );
 				add_filter( 'plugin_row_meta', array( $this, 'plugin_row_meta' ), 10, 2 );
 				add_action( 'admin_notices', array( $this, 'notices' ) );
 
@@ -166,6 +166,7 @@ function woocommerce_product_addons_init() {
 			 */
 			public function init() {
 				require_once dirname( __FILE__ ) . '/includes/class-wc-product-addons-helper.php';
+				require_once dirname( __FILE__ ) . '/includes/class-wc-product-addons-html-generator.php';
 
 				// Pre 3.0 conversion helper to be remove in future.
 				require_once dirname( __FILE__ ) . '/includes/updates/class-wc-product-addons-3-0-conversion-helper.php';
@@ -233,9 +234,25 @@ function woocommerce_product_addons_init() {
 			 * @param WP_Rest_Server $wp_rest_server Rest server class.
 			 */
 			public function rest_api_init( $wp_rest_server ) {
-				require_once dirname( __FILE__ ) . '/includes/api/wc-product-add-ons-groups-controller-v1.php';
-				$this->groups_controller = new WC_Product_Add_Ons_Groups_Controller();
-				$this->groups_controller->register_routes();
+				// v1 controller.
+				require_once dirname( __FILE__ ) . '/includes/api/class-wc-product-add-ons-groups-controller.php';
+				( new WC_Product_Add_Ons_Groups_Controller() )->register_routes();
+
+				// v2 API: common code.
+				require_once dirname( __FILE__ ) . '/includes/api/v2/class-wc-product-addons-api-v2-abstract-group.php';
+				require_once dirname( __FILE__ ) . '/includes/api/v2/class-wc-product-addons-api-v2-global-group.php';
+				require_once dirname( __FILE__ ) . '/includes/api/v2/class-wc-product-addons-api-v2-product-group.php';
+				require_once dirname( __FILE__ ) . '/includes/api/v2/class-wc-product-addons-api-v2-validation.php';
+
+				// v2 API: Global Add-Ons.
+				require_once dirname( __FILE__ ) . '/includes/api/v2/class-wc-product-addons-api-v2-controller.php';
+				$controller_v2 = new WC_Product_Addons_Api_V2_Controller(
+					new WC_Product_Addons_Api_V2_Validation()
+				);
+				$controller_v2->register_routes();
+
+				// v2 API: WC Products endpoint modification.
+				require_once dirname( __FILE__ ) . '/includes/api/v2/class-wc-product-addons-api-v2-product-rest-api.php';
 			}
 
 			/**
@@ -397,6 +414,27 @@ function woocommerce_product_addons_init() {
 				}
 
 				return $resource;
+			}
+
+			/**
+			 * Plugin version getter.
+			 *
+			 * @since  6.9.0
+			 *
+			 * @param  boolean  $base
+			 * @param  string   $version
+			 * @return string
+			 */
+			public function plugin_version( $base = false, $version = '' ) {
+
+				$version = $version ? $version : WC_PRODUCT_ADDONS_VERSION;
+
+				if ( $base ) {
+					$version_parts = explode( '-', $version );
+					$version       = count( $version_parts ) > 1 ? $version_parts[ 0 ] : $version;
+				}
+
+				return $version;
 			}
 		}
 

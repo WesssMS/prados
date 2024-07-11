@@ -10,7 +10,7 @@ class WC_Product_Addons_Global_Group {
 	 * @param WP_Post $post
 	 * @return array
 	 */
-	static public function get_group( $post ) {
+	public static function get_group( $post ) {
 		if ( ! is_a( $post, 'WP_Post' ) ) {
 			throw new Exception( 'WC_Product_Addons_Global_Group::Invalid argument supplied to get_group' );
 		}
@@ -37,7 +37,7 @@ class WC_Product_Addons_Global_Group {
 			'name'                   => $post->post_title,
 			'priority'               => $priority,
 			'restrict_to_categories' => $categories,
-			'fields'                 => $fields
+			'fields'                 => $fields,
 		);
 	}
 
@@ -50,7 +50,7 @@ class WC_Product_Addons_Global_Group {
 	 * @param array $args
 	 * @return array
 	 */
-	static public function create_group( $args ) {
+	public static function create_group( $args ) {
 		// Make sure the args only has keys we are expecting
 		try {
 			WC_Product_Addons_Group_Validator::is_valid_global_addons_group_update( $args );
@@ -61,9 +61,9 @@ class WC_Product_Addons_Global_Group {
 		// All is well, create the post
 		$new_post_id = wp_insert_post(
 			array(
-				'post_title'	=> 'Untitled',
-				'post_status'	=> 'publish',
-				'post_type'		=> 'global_product_addon',
+				'post_title'  => 'Untitled',
+				'post_status' => 'publish',
+				'post_type'   => 'global_product_addon',
 			)
 		);
 
@@ -78,10 +78,10 @@ class WC_Product_Addons_Global_Group {
 	 *
 	 * @throws Exception
 	 * @param WP_Post $post
-	 * @param array $args
+	 * @param array   $args
 	 * @return array
 	 */
-	static public function update_group( $post, $args ) {
+	public static function update_group( $post, $args ) {
 		// Make sure this is a global add-ons $post
 		if ( 'global_product_addon' !== $post->post_type ) {
 			return new WP_Error( 'internal_error', 'Attempted to update a post which is not a global add-ons group custom post type' );
@@ -131,13 +131,13 @@ class WC_Product_Addons_Global_Group {
 	 *
 	 * @throws Exception
 	 * @param WP_Post $post
-	 * @param string $name
+	 * @param string  $name
 	 */
 	protected static function set_name( $post, $name ) {
 		wp_update_post(
 			array(
-				'ID' => $post->ID,
-				'post_title' => $name
+				'ID'         => $post->ID,
+				'post_title' => $name,
 			)
 		);
 	}
@@ -149,7 +149,7 @@ class WC_Product_Addons_Global_Group {
 	 *
 	 * @throws Exception
 	 * @param WP_Post $post
-	 * @param int $priority
+	 * @param int     $priority
 	 */
 	protected static function set_priority( $post, $priority ) {
 		update_post_meta( $post->ID, '_priority', $priority );
@@ -162,7 +162,7 @@ class WC_Product_Addons_Global_Group {
 	 *
 	 * @throws Exception
 	 * @param WP_Post $post
-	 * @param array $category_ids
+	 * @param array   $category_ids
 	 */
 	protected static function set_restrict_to_categories( $post, $category_ids ) {
 		$category_ids = array_map( 'intval', $category_ids );
@@ -182,7 +182,7 @@ class WC_Product_Addons_Global_Group {
 	 *
 	 * @throws Exception
 	 * @param WP_Post $post
-	 * @param array $fields
+	 * @param array   $fields
 	 */
 	protected static function set_fields( $post, $fields ) {
 		$fields = WC_Product_Addons_Groups::coerce_options_to_contain_all_keys_before_saving_to_meta( $fields );

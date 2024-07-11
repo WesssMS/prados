@@ -13,14 +13,17 @@ use Automattic\WooCommerce\Admin\Features\Navigation\Menu;
 use Automattic\WooCommerce\Admin\Features\Navigation\Screen;
 use Automattic\WooCommerce\Admin\Features\Features;
 
+include_once WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/groups/class-wc-product-addons-groups.php';
+
 /**
  * Product_Addon_Admin class.
  */
+
 /**
  * Product Add-Ons admin.
  *
  * @class    WC_Product_Addons_Admin
- * @version  6.8.3
+ * @version  6.9.0
  */
 class WC_Product_Addons_Admin {
 
@@ -110,17 +113,21 @@ class WC_Product_Addons_Admin {
 		include( WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/admin/import/class-wc-product-addons-product-import.php' );
 
 		include( WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/admin/class-wc-product-addons-admin-notices.php' );
+
+		// Admin edit-order screen.
+		include( WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/admin/class-wc-product-addons-admin-order.php' );
+		include( WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/admin/class-wc-product-addons-admin-ajax.php' );
 	}
 
 	/**
 	 * Injects new add-ons settings section.
 	 *
-	 * @param array $sections Other admin settings sections.
+	 * @param  array  $sections  Other admin settings sections.
 	 *
 	 * @return array
 	 */
 	public function add_addons_section( array $sections ): array {
-		$sections['add_ons'] = __( 'Add-ons', 'woocommerce-product-addons' );
+		$sections[ 'add_ons' ] = __( 'Add-ons', 'woocommerce-product-addons' );
 		return $sections;
 	}
 
@@ -144,7 +151,7 @@ class WC_Product_Addons_Admin {
 		$show_subtotal = 'no';
 
 		// Backwards compatibility.
-		if ( isset( $options['show-incomplete-subtotal'] ) && ( 1 === absint( $options['show-incomplete-subtotal'] ) || 'yes' === $options['show-incomplete-subtotal'] ) ) {
+		if ( isset( $options[ 'show-incomplete-subtotal' ] ) && ( 1 === absint( $options[ 'show-incomplete-subtotal' ] ) || 'yes' === $options[ 'show-incomplete-subtotal' ] ) ) {
 			$show_subtotal = 'yes';
 		}
 
@@ -199,23 +206,23 @@ class WC_Product_Addons_Admin {
 
 		// If add-on data are requested via a POST request (e.g. import), return a pre-populated add-on edit form.
 		if ( isset( $_POST[ 'addon' ] ) && ! empty( $_POST[ 'addon' ] ) ) {
-			$addon                       = $_POST[ 'addon' ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			$addon['name']               = isset( $addon[ 'name' ] ) ? sanitize_text_field( wp_unslash($addon[ 'name' ] ) ) : '';
-			$addon['title_format']       = isset( $addon[ 'title_format' ] ) ? sanitize_text_field( wp_unslash($addon[ 'title_format' ] ) ) : '';
-			$addon['description_enable'] = isset( $addon[ 'description_enable' ] ) && '1' === $addon[ 'description_enable' ] ? 1 : 0;
-			$addon['description']        = isset( $addon[ 'description' ] ) ? wp_kses_post( wp_unslash( $addon[ 'description' ] ) ) : '';
-			$addon['placeholder_enable'] = isset( $addon[ 'placeholder_enable' ] ) && '1' === $addon[ 'placeholder_enable' ] ? 1 : 0;
-			$addon['placeholder']        = isset( $addon[ 'placeholder' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'placeholder' ] ) ) : '';
-			$addon['required']           = isset( $addon[ 'required' ] ) && '1' === $addon[ 'required' ] ? 1 : 0;
-			$addon['type']               = isset( $addon[ 'type' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'type' ] ) ) : 'multiple_choice';
-			$addon['display']            = isset( $addon[ 'display' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'display' ] ) ) : 'select';
-			$addon['restrictions']       = isset( $addon[ 'restrictions' ] ) && '1' === $addon[ 'restrictions' ] ? 1 : 0;
-			$addon['restrictions_type']  = isset( $addon[ 'restrictions_type' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'restrictions_type' ] ) ) : 'any_text';
-			$addon['min']                = isset( $addon[ 'min' ] ) ? (float) sanitize_text_field( wp_unslash( $addon[ 'min' ] ) ) : '';
-			$addon['max']                = isset( $addon[ 'max' ] ) ? (float) sanitize_text_field( wp_unslash( $addon[ 'max' ] ) ) : '';
-			$addon['adjust_price']       = isset( $addon[ 'adjust_price' ] ) && '1' === $addon[ 'adjust_price' ] ? 1 : 0;
-			$addon['price_type']         = isset( $addon[ 'price_type' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'price_type' ] ) ) : '';
-			$addon['price']              = isset( $addon[ 'price' ] ) ? wc_format_decimal( sanitize_text_field( wp_unslash( $addon[ 'price' ] ) ) ) : '';
+			$addon                         = $_POST[ 'addon' ]; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$addon[ 'name' ]               = isset( $addon[ 'name' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'name' ] ) ) : '';
+			$addon[ 'title_format' ]       = isset( $addon[ 'title_format' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'title_format' ] ) ) : '';
+			$addon[ 'description_enable' ] = isset( $addon[ 'description_enable' ] ) && '1' === $addon[ 'description_enable' ] ? 1 : 0;
+			$addon[ 'description' ]        = isset( $addon[ 'description' ] ) ? wp_kses_post( wp_unslash( $addon[ 'description' ] ) ) : '';
+			$addon[ 'placeholder_enable' ] = isset( $addon[ 'placeholder_enable' ] ) && '1' === $addon[ 'placeholder_enable' ] ? 1 : 0;
+			$addon[ 'placeholder' ]        = isset( $addon[ 'placeholder' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'placeholder' ] ) ) : '';
+			$addon[ 'required' ]           = isset( $addon[ 'required' ] ) && '1' === $addon[ 'required' ] ? 1 : 0;
+			$addon[ 'type' ]               = isset( $addon[ 'type' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'type' ] ) ) : 'multiple_choice';
+			$addon[ 'display' ]            = isset( $addon[ 'display' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'display' ] ) ) : 'select';
+			$addon[ 'restrictions' ]       = isset( $addon[ 'restrictions' ] ) && '1' === $addon[ 'restrictions' ] ? 1 : 0;
+			$addon[ 'restrictions_type' ]  = isset( $addon[ 'restrictions_type' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'restrictions_type' ] ) ) : 'any_text';
+			$addon[ 'min' ]                = isset( $addon[ 'min' ] ) ? (float) sanitize_text_field( wp_unslash( $addon[ 'min' ] ) ) : '';
+			$addon[ 'max' ]                = isset( $addon[ 'max' ] ) ? (float) sanitize_text_field( wp_unslash( $addon[ 'max' ] ) ) : '';
+			$addon[ 'adjust_price' ]       = isset( $addon[ 'adjust_price' ] ) && '1' === $addon[ 'adjust_price' ] ? 1 : 0;
+			$addon[ 'price_type' ]         = isset( $addon[ 'price_type' ] ) ? sanitize_text_field( wp_unslash( $addon[ 'price_type' ] ) ) : '';
+			$addon[ 'price' ]              = isset( $addon[ 'price' ] ) ? wc_format_decimal( sanitize_text_field( wp_unslash( $addon[ 'price' ] ) ) ) : '';
 
 			if ( isset( $addon[ 'options' ] ) ) {
 				foreach ( $addon[ 'options' ] as $option ) {
@@ -225,32 +232,32 @@ class WC_Product_Addons_Admin {
 					$option[ 'price_type' ] = sanitize_text_field( wp_unslash( $option[ 'price_type' ] ) );
 				}
 			} else {
-				$addon['options'] = array(
+				$addon[ 'options' ] = array(
 					WC_Product_Addons_Admin::get_new_addon_option(),
 				);
 			}
 
-		// Otherwise, return the default add-ons edit form.
+			// Otherwise, return the default add-ons edit form.
 		} else {
-			$addon                       = array();
-			$addon['name']               = '';
-			$addon['title_format']       = 'label';
-			$addon['description_enable'] = '';
-			$addon['description']        = '';
-			$addon['placeholder_enable'] = '';
-			$addon['placeholder']        = '';
-			$addon['required']           = '';
-			$addon['type']               = isset( $_POST[ 'field_type' ] ) ? sanitize_text_field( wp_unslash($_POST[ 'field_type' ] ) ) : 'multiple_choice';
-			$addon['display']            = 'select';
-			$addon['restrictions']       = '';
-			$addon['restrictions_type']  = 'any_text';
-			$addon['min']                = '';
-			$addon['max']                = '';
-			$addon['adjust_price']       = '';
-			$addon['price_type']         = '';
-			$addon['price']              = '';
+			$addon                         = array();
+			$addon[ 'name' ]               = '';
+			$addon[ 'title_format' ]       = 'label';
+			$addon[ 'description_enable' ] = '';
+			$addon[ 'description' ]        = '';
+			$addon[ 'placeholder_enable' ] = '';
+			$addon[ 'placeholder' ]        = '';
+			$addon[ 'required' ]           = '';
+			$addon[ 'type' ]               = isset( $_POST[ 'field_type' ] ) ? sanitize_text_field( wp_unslash( $_POST[ 'field_type' ] ) ) : 'multiple_choice';
+			$addon[ 'display' ]            = 'select';
+			$addon[ 'restrictions' ]       = '';
+			$addon[ 'restrictions_type' ]  = 'any_text';
+			$addon[ 'min' ]                = '';
+			$addon[ 'max' ]                = '';
+			$addon[ 'adjust_price' ]       = '';
+			$addon[ 'price_type' ]         = '';
+			$addon[ 'price' ]              = '';
 
-			$addon['options']            = array(
+			$addon[ 'options' ] = array(
 				WC_Product_Addons_Admin::get_new_addon_option(),
 			);
 		}
@@ -310,23 +317,23 @@ class WC_Product_Addons_Admin {
 				$valid = true;
 
 				foreach ( $import_addons as $key => $addon ) {
-					if ( ! isset( $addon['name'] ) || ! $addon['name'] ) {
+					if ( ! isset( $addon[ 'name' ] ) || ! $addon[ 'name' ] ) {
 						$valid = false;
 					}
-					if ( ! isset( $addon['description'] ) ) {
+					if ( ! isset( $addon[ 'description' ] ) ) {
 						$valid = false;
 					}
-					if ( ! isset( $addon['type'] ) ) {
+					if ( ! isset( $addon[ 'type' ] ) ) {
 						$valid = false;
 					}
-					if ( ! isset( $addon['position'] ) ) {
+					if ( ! isset( $addon[ 'position' ] ) ) {
 						$valid = false;
 					}
-					if ( ! isset( $addon['required'] ) ) {
+					if ( ! isset( $addon[ 'required' ] ) ) {
 						$valid = false;
 					}
 
-					$addon['id'] = $this->generate_id( $current_addon_ids );
+					$addon['id'] = WC_Product_Addons_Helper::generate_id( $current_addon_ids );
 
 					// Sanitize the addon before importing.
 					if ( $valid ) {
@@ -373,6 +380,7 @@ class WC_Product_Addons_Admin {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_register_script( 'woocommerce_product_addons', plugins_url( 'assets/js/admin/admin' . $suffix . '.js', WC_PRODUCT_ADDONS_MAIN_FILE ), array( 'jquery' ), WC_PRODUCT_ADDONS_VERSION, true );
+		wp_register_script( 'woocommerce_pao-admin-order-panel', plugins_url( '/assets/js/admin/meta-boxes-order' . $suffix . '.js', WC_PRODUCT_ADDONS_MAIN_FILE ), array( 'wc-admin-order-meta-boxes', 'jquery-ui-datepicker', 'jquery' ), WC_PRODUCT_ADDONS_VERSION, true );
 
 		$params = array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
@@ -403,12 +411,30 @@ class WC_Product_Addons_Admin {
 		wp_localize_script( 'woocommerce_product_addons', 'wc_pao_params', apply_filters( 'wc_pao_params', $params ) );
 
 		wp_enqueue_script( 'woocommerce_product_addons' );
+
+		if ( ! WC_PAO()->is_current_screen( array( 'product' ) ) ) {
+			wp_enqueue_script( 'woocommerce_pao-admin-order-panel' );
+
+			$params = array(
+				'edit_pao_nonce'                => wp_create_nonce( 'wc_pao_edit_addon' ),
+				'i18n_configure'                => __( 'Configure', 'woocommerce-product-addons' ),
+				'i18n_edit'                     => __( 'Edit', 'woocommerce-product-addons' ),
+				'i18n_form_error'               => __( 'Failed to initialize form. If this issue persists, please reload the page and try again.', 'woocommerce-product-addons' ),
+				'i18n_validation_error'         => __( 'Failed to validate configuration. If this issue persists, please reload the page and try again.', 'woocommerce-product-addons' ),
+				'datepicker_class'              => ! apply_filters( 'woocommerce_pao_disable_datepicker_styles', false ) ? 'wc_pao_datepicker' : '',
+				'datepicker_date_format'        => WC_Product_Addons_Helper::wc_pao_get_js_date_format(),
+				'gmt_offset'                    => -1 * WC_Product_Addons_Helper::wc_pao_get_gmt_offset(), // Revert value to match JS.
+				'date_input_timezone_reference' => WC_Product_Addons_Helper::wc_pao_get_date_input_timezone_reference(),
+			);
+
+			wp_localize_script( 'woocommerce_pao-admin-order-panel', 'wc_pao_admin_order_params', $params );
+		}
 	}
 
 	/**
 	 * Add screen id to WooCommerce.
 	 *
-	 * @param array $screen_ids List of screen IDs.
+	 * @param  array  $screen_ids  List of screen IDs.
 	 * @return array
 	 */
 	public function add_screen_id( $screen_ids ) {
@@ -441,7 +467,7 @@ class WC_Product_Addons_Admin {
 	 * Controls the global addons admin page.
 	 */
 	public function global_addons_admin() {
-		if ( ! empty( $_GET['add'] ) || ! empty( $_GET['edit'] ) ) {
+		if ( ! empty( $_GET[ 'add' ] ) || ! empty( $_GET[ 'edit' ] ) ) {
 
 			if ( $_POST ) {
 
@@ -465,9 +491,9 @@ class WC_Product_Addons_Admin {
 				}
 			}
 
-			if ( ! empty( $_GET['edit'] ) ) {
+			if ( ! empty( $_GET[ 'edit' ] ) ) {
 
-				$edit_id      = absint( $_GET['edit'] );
+				$edit_id      = absint( $_GET[ 'edit' ] );
 				$global_addon = get_post( $edit_id );
 
 				if ( ! $global_addon || 'global_product_addon' !== $global_addon->post_type ) {
@@ -513,12 +539,12 @@ class WC_Product_Addons_Admin {
 			include( dirname( __FILE__ ) . '/views/html-global-admin-add.php' );
 		} else {
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
-			if ( ! empty( $_GET['delete'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( wc_clean( $_REQUEST['_wpnonce'] ), 'delete_addon' ) ) {
-				wp_delete_post( absint( $_GET['delete'] ), true );
+			if ( ! empty( $_GET[ 'delete' ] ) && isset( $_REQUEST[ '_wpnonce' ] ) && wp_verify_nonce( wc_clean( $_REQUEST[ '_wpnonce' ] ), 'delete_addon' ) ) {
+				wp_delete_post( absint( $_GET[ 'delete' ] ), true );
 				echo '<div class="updated"><p>' . esc_html__( 'Add-on deleted successfully', 'woocommerce-product-addons' ) . '</p></div>';
 			}
 
-			$table  = new WC_PAO_List_Table();
+			$table = new WC_PAO_List_Table();
 			$table->prepare_items();
 
 			include( dirname( __FILE__ ) . '/views/html-global-admin.php' );
@@ -529,13 +555,13 @@ class WC_Product_Addons_Admin {
 	 * Converts the field type key to display name.
 	 *
 	 * @since 3.0.0
-	 * @param string $type
+	 * @param  string  $type
 	 * @return string $name
 	 */
 	public function convert_type_name( $type = '' ) {
 		switch ( $type ) {
-			case 'checkboxes':
-				$name = __( 'Checkbox', 'woocommerce-product-addons' );
+			case 'checkbox':
+				$name = __( 'Checkboxes', 'woocommerce-product-addons' );
 				break;
 			case 'custom_price':
 				$name = __( 'Price', 'woocommerce-product-addons' );
@@ -576,10 +602,10 @@ class WC_Product_Addons_Admin {
 
 		check_admin_referer( 'wc_pao_global_addons_edit' );
 
-		$edit_id        = ! empty( $_POST['edit_id'] ) ? absint( $_POST['edit_id'] ) : '';
-		$reference      = ! empty( $_POST['addon-reference'] ) ? wc_clean( wp_unslash( $_POST['addon-reference'] ) ) : '';
-		$priority       = ! empty( $_POST['addon-priority'] ) ? absint( $_POST['addon-priority'] ) : 0;
-		$objects        = ! empty( $_POST['addon-objects'] ) ? array_map( 'absint', $_POST['addon-objects'] ) : array();
+		$edit_id        = ! empty( $_POST[ 'edit_id' ] ) ? absint( $_POST[ 'edit_id' ] ) : '';
+		$reference      = ! empty( $_POST[ 'addon-reference' ] ) ? wc_clean( wp_unslash( $_POST[ 'addon-reference' ] ) ) : '';
+		$priority       = ! empty( $_POST[ 'addon-priority' ] ) ? absint( $_POST[ 'addon-priority' ] ) : 0;
+		$objects        = ! empty( $_POST[ 'addon-objects' ] ) ? array_map( 'absint', $_POST[ 'addon-objects' ] ) : array();
 		$product_addons = $this->get_posted_product_addons();
 
 		if ( ! $reference ) {
@@ -620,15 +646,15 @@ class WC_Product_Addons_Admin {
 		} else {
 
 			$edit_id = wp_insert_post( apply_filters( 'woocommerce_product_addons_global_insert_post_args', array(
-				'post_title'    => $reference,
-				'post_status'   => 'publish',
-				'post_type'     => 'global_product_addon',
-				'tax_input'     => array(
+				'post_title'  => $reference,
+				'post_status' => 'publish',
+				'post_type'   => 'global_product_addon',
+				'tax_input'   => array(
 					'product_cat' => $objects,
 				),
 			), $reference, $objects ) );
 
-			$edit_post['ID'] = $data['edit_id'] = $edit_id;
+			$edit_post[ 'ID' ] = $data[ 'edit_id' ] = $edit_id;
 
 			do_action( 'woocommerce_product_addons_global_create_addons', $edit_post, $objects, $data );
 		}
@@ -650,9 +676,9 @@ class WC_Product_Addons_Admin {
 	 * Add product tab.
 	 */
 	public function tab() {
-	?>
+		?>
 		<li class="addons_tab product_addons hide_if_grouped hide_if_external"><a href="#product_addons_data"><span><?php esc_html_e( 'Add-ons', 'woocommerce-product-addons' ); ?></span></a></li>
-	<?php
+		<?php
 	}
 
 	/**
@@ -702,7 +728,7 @@ class WC_Product_Addons_Admin {
 	/**
 	 * Process meta box.
 	 *
-	 * @param int $post_id Post ID.
+	 * @param  int  $post_id  Post ID.
 	 */
 	public function process_meta_box( $post_id ) {
 
@@ -715,8 +741,8 @@ class WC_Product_Addons_Admin {
 
 		// Save addons as serialised array.
 		$product_addons                = $this->get_posted_product_addons();
-		$product_addons_exclude_global = isset( $_POST['_product_addons_exclude_global'] ) ? 0 : 1;
-		$product = wc_get_product( $post_id );
+		$product_addons_exclude_global = isset( $_POST[ '_product_addons_exclude_global' ] ) ? 0 : 1;
+		$product                       = wc_get_product( $post_id );
 		$product->update_meta_data( '_product_addons', $product_addons );
 		$product->update_meta_data( '_product_addons_exclude_global', $product_addons_exclude_global );
 		$product->save();
@@ -756,7 +782,7 @@ class WC_Product_Addons_Admin {
 		if ( ! empty( $post ) ) {
 			$current_addon_data = WC_Product_Addons_Helper::get_product_addons( $post->ID, false, true, false );
 
-		// Global addons.
+			// Global addons.
 		} elseif ( ! empty( $_GET[ 'edit' ] ) ) {
 			$edit_id            = absint( $_GET[ 'edit' ] );
 			$global_addon       = get_post( $edit_id );
@@ -770,35 +796,35 @@ class WC_Product_Addons_Admin {
 		}
 
 		// phpcs:disable WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		if ( isset( $_POST['product_addon_name'] ) ) {
-			$addon_name               = $_POST['product_addon_name' ];
-			$addon_title_format       = isset( $_POST['product_addon_title_format'] ) ? $_POST['product_addon_title_format'] : array();
-			$addon_description_enable = isset( $_POST['product_addon_description_enable'] ) ? $_POST['product_addon_description_enable'] : array();
-			$addon_description        = isset( $_POST['product_addon_description'] ) ? $_POST['product_addon_description'] : array();
-			$addon_placeholder_enable = isset( $_POST['product_addon_placeholder_enable'] ) ? $_POST['product_addon_placeholder_enable'] : array();
-			$addon_placeholder        = isset( $_POST['product_addon_placeholder'] ) ? $_POST['product_addon_placeholder'] : array();
-			$addon_type               = isset( $_POST['product_addon_type'] ) ?  $_POST['product_addon_type'] : array();
-			$addon_display            = isset( $_POST['product_addon_display'] ) ? $_POST['product_addon_display'] : array();
-			$addon_position           = isset( $_POST['product_addon_position'] ) ? $_POST['product_addon_position'] : array();
-			$addon_required           = isset( $_POST['product_addon_required'] ) ?  $_POST['product_addon_required'] : array();
-			$addon_option_label       = isset( $_POST['product_addon_option_label'] ) ? $_POST['product_addon_option_label'] : array();
-			$addon_option_price       = isset( $_POST['product_addon_option_price'] ) ? $_POST['product_addon_option_price'] : array();
-			$addon_option_price_type  = isset( $_POST['product_addon_option_price_type'] ) ? $_POST['product_addon_option_price_type'] : array();
-			$addon_option_image       = isset( $_POST['product_addon_option_image'] ) ? $_POST['product_addon_option_image'] : array();
-			$addon_restrictions       = isset( $_POST['product_addon_restrictions'] ) ? $_POST['product_addon_restrictions'] : array();
-			$addon_restrictions_type  = isset( $_POST['product_addon_restrictions_type'] ) ? $_POST['product_addon_restrictions_type'] : array();
-			$addon_adjust_price       = isset( $_POST['product_addon_adjust_price'] ) ? $_POST['product_addon_adjust_price'] : array();
-			$addon_price_type         = isset( $_POST['product_addon_price_type'] ) ? $_POST['product_addon_price_type'] : array();
-			$addon_price              = isset( $_POST['product_addon_price'] ) ? $_POST['product_addon_price'] : array();
-			$addon_min                = isset( $_POST['product_addon_min'] ) ? $_POST['product_addon_min'] : array();
-			$addon_max                = isset( $_POST['product_addon_max'] ) ? $_POST['product_addon_max'] : array();
-			$id                       = isset( $_POST['product_addon_id'] ) ? $_POST['product_addon_id'] : array();
+		if ( isset( $_POST[ 'product_addon_name' ] ) ) {
+			$addon_name               = $_POST[ 'product_addon_name' ];
+			$addon_title_format       = isset( $_POST[ 'product_addon_title_format' ] ) ? $_POST[ 'product_addon_title_format' ] : array();
+			$addon_description_enable = isset( $_POST[ 'product_addon_description_enable' ] ) ? $_POST[ 'product_addon_description_enable' ] : array();
+			$addon_description        = isset( $_POST[ 'product_addon_description' ] ) ? $_POST[ 'product_addon_description' ] : array();
+			$addon_placeholder_enable = isset( $_POST[ 'product_addon_placeholder_enable' ] ) ? $_POST[ 'product_addon_placeholder_enable' ] : array();
+			$addon_placeholder        = isset( $_POST[ 'product_addon_placeholder' ] ) ? $_POST[ 'product_addon_placeholder' ] : array();
+			$addon_type               = isset( $_POST[ 'product_addon_type' ] ) ? $_POST[ 'product_addon_type' ] : array();
+			$addon_display            = isset( $_POST[ 'product_addon_display' ] ) ? $_POST[ 'product_addon_display' ] : array();
+			$addon_position           = isset( $_POST[ 'product_addon_position' ] ) ? $_POST[ 'product_addon_position' ] : array();
+			$addon_required           = isset( $_POST[ 'product_addon_required' ] ) ? $_POST[ 'product_addon_required' ] : array();
+			$addon_option_label       = isset( $_POST[ 'product_addon_option_label' ] ) ? $_POST[ 'product_addon_option_label' ] : array();
+			$addon_option_price       = isset( $_POST[ 'product_addon_option_price' ] ) ? $_POST[ 'product_addon_option_price' ] : array();
+			$addon_option_price_type  = isset( $_POST[ 'product_addon_option_price_type' ] ) ? $_POST[ 'product_addon_option_price_type' ] : array();
+			$addon_option_image       = isset( $_POST[ 'product_addon_option_image' ] ) ? $_POST[ 'product_addon_option_image' ] : array();
+			$addon_restrictions       = isset( $_POST[ 'product_addon_restrictions' ] ) ? $_POST[ 'product_addon_restrictions' ] : array();
+			$addon_restrictions_type  = isset( $_POST[ 'product_addon_restrictions_type' ] ) ? $_POST[ 'product_addon_restrictions_type' ] : array();
+			$addon_adjust_price       = isset( $_POST[ 'product_addon_adjust_price' ] ) ? $_POST[ 'product_addon_adjust_price' ] : array();
+			$addon_price_type         = isset( $_POST[ 'product_addon_price_type' ] ) ? $_POST[ 'product_addon_price_type' ] : array();
+			$addon_price              = isset( $_POST[ 'product_addon_price' ] ) ? $_POST[ 'product_addon_price' ] : array();
+			$addon_min                = isset( $_POST[ 'product_addon_min' ] ) ? $_POST[ 'product_addon_min' ] : array();
+			$addon_max                = isset( $_POST[ 'product_addon_max' ] ) ? $_POST[ 'product_addon_max' ] : array();
+			$id                       = isset( $_POST[ 'product_addon_id' ] ) ? $_POST[ 'product_addon_id' ] : array();
 			// phpcs:enable WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized end
 
 			for ( $i = 0; $i < count( $addon_name ); $i++ ) {
 				if ( ! isset( $addon_name[ $i ] ) || ( '' == $addon_name[ $i ] ) ) {
 					$empty_title_error = true;
-					$addon_name[ $i ] = '-';
+					$addon_name[ $i ]  = '-';
 				}
 
 				if ( strlen( $addon_name[ $i ] ) > 255 ) {
@@ -847,15 +873,15 @@ class WC_Product_Addons_Admin {
 				$data['price']              = wc_format_decimal( sanitize_text_field( wp_unslash( $addon_price[ $i ] ) ) );
 				$data['min']                = 1 === $data[ 'restrictions' ] ? (float) sanitize_text_field( wp_unslash( $addon_min[ $i ] ) ) : 0;
 				$data['max']                = 1 === $data[ 'restrictions' ] ? (float) sanitize_text_field( wp_unslash( $addon_max[ $i ] ) ) : 0;
-				$data['id']                 = isset( $id[ $i ] ) && ! empty( $id[ $i ] ) ? $id[ $i ] : $this->generate_id( $current_addon_ids );
+				$data['id']                 = isset( $id[ $i ] ) && ! empty( $id[ $i ] ) ? $id[ $i ] : WC_Product_Addons_Helper::generate_id( $current_addon_ids );
 
 				if ( ! empty( $addon_options ) ) {
-					$data['options'] = $addon_options;
+					$data[ 'options' ] = $addon_options;
 				}
 
 				// Always use quantity based price type for custom price.
-				if ( 'custom_price' === $data['type'] ) {
-					$data['price_type'] = 'quantity_based';
+				if ( 'custom_price' === $data[ 'type' ] ) {
+					$data[ 'price_type' ] = 'quantity_based';
 				}
 
 				// Add to array.
@@ -880,40 +906,40 @@ class WC_Product_Addons_Admin {
 	 * Sanitize the addon.
 	 *
 	 * @since 3.0.36
-	 * @param array $addon Array containing the addon data.
+	 * @param  array  $addon  Array containing the addon data.
 	 * @return array
 	 */
 	public function sanitize_addon( $addon ) {
 		$sanitized = array(
-			'name'               => sanitize_text_field( $addon['name'] ),
-			'title_format'       => sanitize_text_field( $addon['title_format'] ),
-			'description_enable' => ! empty( $addon['description_enable'] ) ? 1 : 0,
-			'description'        => wp_kses_post( $addon['description'] ),
-			'placeholder_enable' => ! empty( $addon['placeholder_enable'] ) ? 1 : 0,
-			'placeholder'        => ! empty( $addon['placeholder'] ) ? sanitize_text_field( $addon['placeholder'] ) : '',
-			'type'               => sanitize_text_field( $addon['type'] ),
-			'display'            => sanitize_text_field( $addon['display'] ),
-			'position'           => absint( $addon['position'] ),
-			'required'           => ! empty( $addon['required'] ) ? 1 : 0,
-			'restrictions'       => ! empty( $addon['restrictions'] ) ? 1 : 0,
-			'restrictions_type'  => sanitize_text_field( $addon['restrictions_type'] ),
-			'adjust_price'       => ! empty( $addon['adjust_price'] ) ? 1 : 0,
-			'price_type'         => sanitize_text_field( $addon['price_type'] ),
-			'price'              => wc_format_decimal( sanitize_text_field( $addon['price'] ) ),
-			'min'                => (float) sanitize_text_field( $addon['min'] ),
-			'max'                => (float) sanitize_text_field( $addon['max'] ),
-			'id'                 => isset( $addon['id'] ) ? absint( $addon['id'] ) : 0,
+			'name'               => sanitize_text_field( $addon[ 'name' ] ),
+			'title_format'       => sanitize_text_field( $addon[ 'title_format' ] ),
+			'description_enable' => ! empty( $addon[ 'description_enable' ] ) ? 1 : 0,
+			'description'        => wp_kses_post( $addon[ 'description' ] ),
+			'placeholder_enable' => ! empty( $addon[ 'placeholder_enable' ] ) ? 1 : 0,
+			'placeholder'        => ! empty( $addon[ 'placeholder' ] ) ? sanitize_text_field( $addon[ 'placeholder' ] ) : '',
+			'type'               => sanitize_text_field( $addon[ 'type' ] ),
+			'display'            => sanitize_text_field( $addon[ 'display' ] ),
+			'position'           => absint( $addon[ 'position' ] ),
+			'required'           => ! empty( $addon[ 'required' ] ) ? 1 : 0,
+			'restrictions'       => ! empty( $addon[ 'restrictions' ] ) ? 1 : 0,
+			'restrictions_type'  => sanitize_text_field( $addon[ 'restrictions_type' ] ),
+			'adjust_price'       => ! empty( $addon[ 'adjust_price' ] ) ? 1 : 0,
+			'price_type'         => sanitize_text_field( $addon[ 'price_type' ] ),
+			'price'              => wc_format_decimal( sanitize_text_field( $addon[ 'price' ] ) ),
+			'min'                => (float) sanitize_text_field( $addon[ 'min' ] ),
+			'max'                => (float) sanitize_text_field( $addon[ 'max' ] ),
+			'id'                 => isset( $addon[ 'id' ] ) ? absint( $addon[ 'id' ] ) : 0,
 		);
 
-		if ( isset( $addon[ 'options' ] ) && is_array( $addon['options'] ) ) {
-			$sanitized['options'] = array();
+		if ( isset( $addon[ 'options' ] ) && is_array( $addon[ 'options' ] ) ) {
+			$sanitized[ 'options' ] = array();
 
-			foreach ( $addon['options'] as $key => $option ) {
-				$sanitized['options'][ $key ] = array(
-					'label'      => sanitize_text_field( $option['label'] ),
-					'price'      => wc_format_decimal( sanitize_text_field( $option['price'] ) ),
-					'image'      => sanitize_text_field( $option['image'] ),
-					'price_type' => sanitize_text_field( $option['price_type'] ),
+			foreach ( $addon[ 'options' ] as $key => $option ) {
+				$sanitized[ 'options' ][ $key ] = array(
+					'label'      => sanitize_text_field( $option[ 'label' ] ),
+					'price'      => wc_format_decimal( sanitize_text_field( $option[ 'price' ] ) ),
+					'image'      => sanitize_text_field( $option[ 'image' ] ),
+					'price_type' => sanitize_text_field( $option[ 'price_type' ] ),
 				);
 			}
 		}
@@ -925,13 +951,14 @@ class WC_Product_Addons_Admin {
 	 * Filters the admin order hidden metas to hide addons.
 	 *
 	 * @since 3.0.0
-	 * @param array $hidden_metas
+	 * @param  array  $hidden_metas
 	 */
 	public function filter_hidden_order_itemmeta( $hidden_metas ) {
 		$hidden_metas[] = '_wc_pao_addon_name';
 		$hidden_metas[] = '_wc_pao_addon_value';
 		$hidden_metas[] = '_wc_pao_addon_field_type';
 		$hidden_metas[] = '_reduced_stock';
+		$hidden_metas[] = '_pao_total';
 
 		return $hidden_metas;
 	}
@@ -940,9 +967,9 @@ class WC_Product_Addons_Admin {
 	 * Filters the admin order line item to show only addons.
 	 *
 	 * @since 3.0.0
-	 * @param int $item_id
-	 * @param object $item
-	 * @param object $order
+	 * @param  int     $item_id
+	 * @param  object  $item
+	 * @param  object  $order
 	 */
 	public function filter_order_line_item_html( $item_id, $item, $order ) {
 		$is_addon = ! empty( $item->get_meta( '_wc_pao_addon_value', true ) );
@@ -956,9 +983,9 @@ class WC_Product_Addons_Admin {
 	 * Filters the admin order line item to show only addons.
 	 *
 	 * @since 3.0.0
-	 * @param int $item_id
-	 * @param object $item
-	 * @param object $order
+	 * @param  int     $item_id
+	 * @param  object  $item
+	 * @param  object  $order
 	 */
 	public function filter_order_line_item_after_html( $item_id, $item, $order ) {
 		$addon_name  = $item->get_meta( '_wc_pao_addon_name', true );
@@ -1002,49 +1029,23 @@ class WC_Product_Addons_Admin {
 	/**
 	 * Sort addons.
 	 *
-	 * @param  array $a First item to compare.
-	 * @param  array $b Second item to compare.
+	 * @param  array  $a  First item to compare.
+	 * @param  array  $b  Second item to compare.
 	 * @return bool
 	 */
 	protected function addons_cmp( $a, $b ) {
-		if ( $a['position'] == $b['position'] ) {
+		if ( $a[ 'position' ] == $b[ 'position' ] ) {
 			return 0;
 		}
 
-		return ( $a['position'] < $b['position'] ) ? -1 : 1;
-	}
-
-	/**
-	 * Generate a unique timestamp and use it as id.
-	 *
-	 * @since  5.0.1
-	 *
-	 * @param  array  $existing_ids
-	 * @return int
-	 */
-	protected function generate_id( $existing_ids ) {
-
-		$generated_id    = current_time( 'timestamp' );
-		$blacklisted_ids = array_merge( $existing_ids, $this->generated_ids );
-		$found_unique_id = false;
-
-		while ( ! $found_unique_id ) {
-			$generated_id++;
-			if ( ! in_array( $generated_id, $blacklisted_ids ) ) {
-				$found_unique_id = true;
-			}
-		}
-
-		$this->generated_ids[] = $generated_id;
-
-		return $generated_id;
+		return ( $a[ 'position' ] < $b[ 'position' ] ) ? -1 : 1;
 	}
 
 	/**
 	 * Prints warning messages in the admin area.
 	 *
-	 * @param string $content
-	 * @param string $type
+	 * @param  string  $content
+	 * @param  string  $type
 	 * @return void
 	 */
 	public function output_notice( $content, $type ) {

@@ -10,7 +10,7 @@ class WC_Product_Addons_Product_Group {
 	 * @param WP_Post $post
 	 * @return array
 	 */
-	static public function get_group( $post ) {
+	public static function get_group( $post ) {
 		if ( ! is_a( $post, 'WP_Post' ) ) {
 			throw new Exception( 'WC_Product_Addons_Product_Group::Invalid argument supplied to get_group' );
 		}
@@ -30,9 +30,9 @@ class WC_Product_Addons_Product_Group {
 		$exclude_global_add_ons = self::get_exclude_global_add_ons( $post );
 
 		return array(
-			'id'                       => $post->ID,
-			'exclude_global_add_ons'   => $exclude_global_add_ons,
-			'fields'                   => $fields
+			'id'                     => $post->ID,
+			'exclude_global_add_ons' => $exclude_global_add_ons,
+			'fields'                 => $fields,
 		);
 	}
 
@@ -43,10 +43,10 @@ class WC_Product_Addons_Product_Group {
 	 *
 	 * @throws Exception
 	 * @param WP_Post $post
-	 * @param array $args
+	 * @param array   $args
 	 * @return array
 	 */
-	static public function update_group( $post, $args ) {
+	public static function update_group( $post, $args ) {
 		// Make sure this is a global add-ons $post
 		if ( 'product' !== $post->post_type ) {
 			return new WP_Error( 'internal_error', "Attempted to update a post ({$post->ID}) which is not a 'product' custom post type ({$post->post_type})" );
@@ -80,12 +80,12 @@ class WC_Product_Addons_Product_Group {
 	 * @since 2.9.0
 	 *
 	 * @param WP_Post $post
-	 * @param mixed $value
-	 * @param array $category_ids
+	 * @param mixed   $value
+	 * @param array   $category_ids
 	 */
 	protected static function set_exclude_global_add_ons( $post, $value ) {
 		$new_value = empty( $value ) ? '0' : '1';
-		$product = wc_get_product( $post->ID );
+		$product   = wc_get_product( $post->ID );
 		$product->update_meta_data( '_product_addons_exclude_global', $new_value );
 		$product->save_meta_data();
 	}
@@ -112,10 +112,10 @@ class WC_Product_Addons_Product_Group {
 	 *
 	 * @throws Exception
 	 * @param WP_Post $post
-	 * @param array $fields
+	 * @param array   $fields
 	 */
 	protected static function set_fields( $post, $fields ) {
-		$fields = WC_Product_Addons_Groups::coerce_options_to_contain_all_keys_before_saving_to_meta( $fields );
+		$fields  = WC_Product_Addons_Groups::coerce_options_to_contain_all_keys_before_saving_to_meta( $fields );
 		$product = wc_get_product( $post->ID );
 		$product->update_meta_data( '_product_addons', $fields );
 		$product->save_meta_data();

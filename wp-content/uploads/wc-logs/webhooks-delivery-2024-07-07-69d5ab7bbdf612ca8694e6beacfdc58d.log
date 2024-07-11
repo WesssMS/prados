@@ -1,0 +1,51 @@
+2024-07-07T19:05:17+00:00 INFO Array
+(
+    [Webhook Delivery] => Array
+        (
+            [Delivery ID] => db8ac96db67b08ec1a0e3409f1f0adbd
+            [Date] => 7 de julho de 2024 @ 19:05
+            [URL] => http://localhost/projeto/modelos
+            [Duration] => 1.59866
+            [Request] => Array
+                (
+                    [Method] => POST
+                    [Headers] => Array
+                        (
+                            [User-Agent] => WooCommerce/9.0.2 Hookshot (WordPress/6.5.5)
+                            [Content-Type] => application/json
+                            [X-WC-Webhook-Source] => http://localhost/projeto/modelos/
+                            [X-WC-Webhook-Topic] => order.created
+                            [X-WC-Webhook-Resource] => order
+                            [X-WC-Webhook-Event] => created
+                            [X-WC-Webhook-Signature] => FtthQq6pacoCjard1kBmVfxzOO5aygk4Ed5Kw3i0L5U=
+                            [X-WC-Webhook-ID] => 1
+                            [X-WC-Webhook-Delivery-ID] => db8ac96db67b08ec1a0e3409f1f0adbd
+                        )
+
+                )
+
+            [Body] => Webhook body is not logged unless WP_DEBUG mode is turned on. This is to avoid the storing of personal data in the logs.
+            [Response] => Array
+                (
+                    [Code] => 301
+                    [Message] => Moved Permanently
+                    [Headers] => WpOrg\Requests\Utility\CaseInsensitiveDictionary Object
+                        (
+                            [data:protected] => Array
+                                (
+                                    [date] => Sun, 07 Jul 2024 19:05:17 GMT
+                                    [server] => Apache/2.4.56 (Win64) OpenSSL/1.1.1t PHP/8.2.4
+                                    [location] => http://localhost/projeto/modelos/
+                                    [content-length] => 340
+                                    [content-type] => text/html; charset=iso-8859-1
+                                )
+
+                        )
+
+                    [Body] => Webhook body is not logged unless WP_DEBUG mode is turned on. This is to avoid the storing of personal data in the logs.
+                )
+
+        )
+
+)
+

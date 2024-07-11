@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * 3rd-party Extensions Compatibility.
  *
  * @class    WC_PAO_Compatibility
- * @version  6.7.0
+ * @version  x.x.x
  */
 class WC_PAO_Compatibility {
 
@@ -81,8 +81,8 @@ class WC_PAO_Compatibility {
 	public function __construct() {
 
 		$this->required = array(
-			'pb'     => '7.0.0',
-			'cp'     => '9.0.0',
+			'pb'     => '7.2.0',
+			'cp'     => '9.1.0',
 			'blocks' => '7.2.0',
 		);
 
@@ -146,6 +146,11 @@ class WC_PAO_Compatibility {
 		// PayPal compatibility.
 		if ( class_exists( '\WooCommerce\PayPalCommerce\PluginModule' ) ) {
 			$module_paths[ 'paypal' ] = WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/compatibility/modules/class-wc-product-addons-paypal-compatibility.php';
+		}
+
+		// Product Editor support.
+		if ( class_exists( 'Automattic\WooCommerce\Utilities\FeaturesUtil' ) && Automattic\WooCommerce\Utilities\FeaturesUtil::feature_is_enabled( 'product_block_editor' ) ) {
+			$module_paths[ 'wc_product_editor' ] = WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/compatibility/modules/class-wc-product-addons-product-editor-compatibility.php';
 		}
 
 		/**

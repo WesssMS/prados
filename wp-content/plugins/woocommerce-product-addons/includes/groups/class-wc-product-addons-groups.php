@@ -1,6 +1,7 @@
 <?php
 
 class WC_Product_Addons_Groups {
+
 	/**
 	 * Returns all the global groups (if any) and their add-ons
 	 *
@@ -12,12 +13,12 @@ class WC_Product_Addons_Groups {
 		$global_groups = array();
 
 		$args = array(
-			'posts_per_page'  => -1,
-			'orderby'         => 'title',
-			'order'           => 'ASC',
-			'post_type'       => 'global_product_addon',
-			'post_status'     => 'any',
-			'suppress_filters' => true
+			'posts_per_page'   => -1,
+			'orderby'          => 'title',
+			'order'            => 'ASC',
+			'post_type'        => 'global_product_addon',
+			'post_status'      => 'any',
+			'suppress_filters' => true,
 		);
 
 		$global_group_posts = get_posts( $args );
@@ -57,7 +58,7 @@ class WC_Product_Addons_Groups {
 	 * @since 2.9.0
 	 *
 	 * @param integer $id
-	 * @param array $args
+	 * @param array   $args
 	 * @return array
 	 */
 	public static function update_group( $id, $args ) {
@@ -83,7 +84,7 @@ class WC_Product_Addons_Groups {
 			return new WP_Error( 'invalid_id', esc_html__( 'Unable to delete group. Invalid global add ons group ID.', 'woocommerce-product-addons' ) );
 		}
 
-		$post = WP_Post::get_instance( $id );
+		$post         = WP_Post::get_instance( $id );
 		$trashed_post = WC_Product_Addons_Global_Group::get_group( $post );
 		wp_delete_post( $id, true );
 
@@ -101,7 +102,7 @@ class WC_Product_Addons_Groups {
 	public static function is_a_global_group_id( $id ) {
 		$post = WP_Post::get_instance( $id );
 
-		if ( ! is_a( $post, 'WP_Post') ) {
+		if ( ! is_a( $post, 'WP_Post' ) ) {
 			return false;
 		}
 
@@ -121,8 +122,8 @@ class WC_Product_Addons_Groups {
 		$option_defaults = array(
 			'label' => '(empty)',
 			'price' => '',
-			'min' => '',
-			'max' => '',
+			'min'   => '',
+			'max'   => '',
 		);
 
 		foreach ( $fields as $key => $field ) {

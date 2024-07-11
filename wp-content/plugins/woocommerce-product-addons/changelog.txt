@@ -1,5 +1,14 @@
 *** Product Addons Changelog ***
 
+2024-07-03 - version 6.9.0
+* Important: New - Product Add-Ons now requires Product Bundles 7.2+ for the integration between the two plugins to work.
+* Important: New - Product Add-Ons now requires Composite Products 9.1+ for the integration between the two plugins to work.
+* New - REST API v2.
+* New - Introduced compatibility with the new Product Editor.
+* New - Added support for add-ons configuration in admin orders.
+* Tweak - Started recording raw prices and user supplied values for orders created with add-ons.
+* Fix - Fixed Add-On type display value in admin for the Checkboxes Add-On type.
+
 2024-06-04 - version 6.8.4
 * Fix - Improved validation of values when getting maintenance and dismissed notices from the DB.
 

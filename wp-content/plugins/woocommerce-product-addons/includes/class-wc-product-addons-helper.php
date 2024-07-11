@@ -8,6 +8,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class WC_Product_Addons_Helper {
+
+	/**
+	 * Array of Add-on IDs used in this request.
+	 *
+	 * @var array
+	 */
+	public static $addon_ids = array();
+
 	/**
 	 * Gets global product addons. The result is cached.
 	 *
@@ -638,5 +646,29 @@ class WC_Product_Addons_Helper {
 		return $store_timestamp->getTimestamp();
 	}
 
+	/**
+	 * Generate a unique timestamp and use it as id.
+	 *
+	 * @since  6.9.0
+	 *
+	 * @param  array  $existing_ids
+	 * @return int
+	 */
+	public static function generate_id( $existing_ids = array() ) {
 
+		$generated_id    = current_time( 'timestamp' );
+		$blacklisted_ids = array_merge( $existing_ids, self::$addon_ids );
+		$found_unique_id = false;
+
+		while ( ! $found_unique_id ) {
+			$generated_id++;
+			if ( ! in_array( $generated_id, $blacklisted_ids ) ) {
+				$found_unique_id = true;
+			}
+		}
+
+		self::$addon_ids[] = $generated_id;
+
+		return $generated_id;
+	}
 }

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Product_Addon_Display class.
  *
- * @version 6.8.0
+ * @version 6.9.0
  */
 class WC_Product_Addons_Display {
 	public $show_num_chars;
@@ -234,7 +234,7 @@ class WC_Product_Addons_Display {
 				);
 
 				// This is sanitised in the template files and earlier functions.
-				echo $this->get_addon_html( $addon ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+				echo WC_Product_Addons_Html_Generator::get_addon_html( $addon ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
 				wc_get_template(
 					'addons/addon-end.php',
@@ -302,207 +302,6 @@ class WC_Product_Addons_Display {
 	 */
 	public function notices( $post_id ) {
 		echo '<div class="validation_message woocommerce-info" id="required_addons_validation_message"></div>';
-	}
-
-	/**
-	 * Get add-on field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 * @return string
-	 */
-	public function get_addon_html( $addon ) {
-		ob_start();
-
-		$method_name = 'get_' . $addon['type'] . '_html';
-
-		if ( method_exists( $this, $method_name ) ) {
-			$this->$method_name( $addon );
-		}
-
-		do_action( 'woocommerce_product_addons_get_' . $addon['type'] . '_html', $addon );
-
-		return ob_get_clean();
-	}
-
-	/**
-	 * Get multiple choice HTML.
-	 *
-	 * @since 3.0.0
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_multiple_choice_html( $addon ) {
-		switch ( $addon['display'] ) {
-			case 'images':
-				$this->get_image_html( $addon );
-				break;
-			case 'radiobutton':
-				$this->get_radiobutton_html( $addon );
-				break;
-			case 'select':
-				$this->get_select_html( $addon );
-				break;
-		}
-	}
-
-	/**
-	 * Get image swatches field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_image_html( $addon ) {
-		wc_get_template(
-			'addons/image.php',
-			array(
-				'addon' => $addon,
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get checkbox field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_checkbox_html( $addon ) {
-		wc_get_template(
-			'addons/checkbox.php',
-			array(
-				'addon' => $addon,
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get radio button field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_radiobutton_html( $addon ) {
-		wc_get_template(
-			'addons/radiobutton.php',
-			array(
-				'addon' => $addon,
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get select field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_select_html( $addon ) {
-		wc_get_template(
-			'addons/select.php',
-			array(
-				'addon' => $addon,
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get custom field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_custom_text_html( $addon ) {
-		wc_get_template(
-			'addons/custom-text.php',
-			array(
-				'addon' => $addon,
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get custom textarea field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_custom_textarea_html( $addon ) {
-		wc_get_template(
-			'addons/custom-textarea.php',
-			array(
-				'addon' => $addon,
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get file upload field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_file_upload_html( $addon ) {
-		wc_get_template(
-			'addons/file-upload.php',
-			array(
-				'addon'    => $addon,
-				'max_size' => size_format( wp_max_upload_size() ),
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get custom price field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_custom_price_html( $addon ) {
-		wc_get_template(
-			'addons/custom-price.php',
-			array(
-				'addon' => $addon,
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get input multiplier field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_input_multiplier_html( $addon ) {
-		wc_get_template(
-			'addons/input-multiplier.php',
-			array(
-				'addon' => $addon,
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
-	}
-
-	/**
-	 * Get datepicker field HTML.
-	 *
-	 * @param array $addon Add-on field data.
-	 */
-	public function get_datepicker_html( $addon ) {
-		wc_get_template(
-			'addons/datepicker.php',
-			array(
-				'addon'    => $addon
-			),
-			'woocommerce-product-addons',
-			WC_PRODUCT_ADDONS_PLUGIN_PATH . '/templates/'
-		);
 	}
 
 	/**
@@ -842,5 +641,22 @@ class WC_Product_Addons_Display {
 	public function reposition_display_for_variable_product() {
 		remove_action( 'woocommerce_before_add_to_cart_button', array( $this, 'display' ), 10 );
 		add_action( 'woocommerce_single_variation', array( $this, 'display' ), 15 );
+	}
+
+	/**
+	 * Magic method to call methods from WC_Product_Addons_Html class.
+	 *
+	 * Ensures that deprecated methods are called from the correct class.
+	 *
+	 * @since 6.9.0
+	 * @param string $name Method name.
+	 * @param array  $arguments Method arguments.
+	 * @return mixed
+	 */
+	public function __call( $name, $arguments ) {
+		if ( method_exists( WC_Product_Addons_Html_Generator::class, $name ) ) {
+			_deprecated_function( esc_attr( self::class . '::' . $name . '()' ), '6.9.0', esc_attr( 'WC_Product_Addons_Html::' . $name ) );
+			return call_user_func_array( array( WC_Product_Addons_Html_Generator::class, $name ), $arguments );
+		}
 	}
 }

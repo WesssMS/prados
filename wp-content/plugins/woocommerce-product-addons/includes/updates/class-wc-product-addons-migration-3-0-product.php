@@ -3,11 +3,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * WC_Product_Addons_Migration_3_0_Product class
+ * 
+ * @since x.x.x
+ */
 class WC_Product_Addons_Migration_3_0_Product {
 	/**
 	 * Constructor
-	 *
-	 * @since 3.0.0
 	 */
 	public function __construct() {
 		add_action( 'template_redirect', array( $this, 'migrate' ) );
@@ -32,6 +35,7 @@ class WC_Product_Addons_Migration_3_0_Product {
 
 		if ( empty( $converted ) ) {
 			$addon_fields = get_post_meta( $post_id, '_product_addons', true );
+			$addon_fields = is_array( $addon_fields ) ? $addon_fields : maybe_unserialize( $addon_fields );
 
 			if ( empty( $addon_fields ) ) {
 				return;

@@ -63,7 +63,7 @@ jQuery( function( $ ) {
 			}
 
 			$addons_tyoe_select.find( 'option[value="add"]' ).prop( 'selected', 'selected' );
-			$addons_tyoe_select.blur();
+			$addons_tyoe_select.trigger( 'blur' );
 
 			$( document.body ).trigger( 'init_tooltips' );
 		},
@@ -672,7 +672,7 @@ jQuery( function( $ ) {
 
 				e.preventDefault();
 
-				$(this).blur();
+				$(this).trigger( 'blur' );
 
 				let imported_addons = window.prompt( wc_pao_params.i18n.import_addons_prompt );
 

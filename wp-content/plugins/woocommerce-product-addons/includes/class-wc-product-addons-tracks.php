@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Tracks support.
  *
  * @class    WC_PAO_Tracks
- * @version  6.3.3
+ * @version  6.9.0
  */
 class WC_PAO_Tracks {
 
@@ -34,6 +34,10 @@ class WC_PAO_Tracks {
 		// Records an event when global add-ons are created.
 		add_action( 'woocommerce_product_addons_global_create_addons', array( __CLASS__, 'record_global_addon_created_event' ) );
 
+		// Records an event when the addon edit form is rendered in the admin order form.
+		add_action( 'woocommerce_product_addons_editing_in_order_form', array( __CLASS__, 'record_edit_in_order_render' ) );
+		// Records an event when a product with add-ons is edited in the admin order form.
+		add_action( 'woocommerce_product_addons_editing_in_order', array( __CLASS__, 'record_edit_in_order_save' ) );
 	}
 
 	/**
@@ -73,6 +77,40 @@ class WC_PAO_Tracks {
 		}
 
 		self::record_event( 'global_addon_created' );
+	}
+
+	/**
+	 * Records a 'addon_edit_in_order_render' event in Tracks every time the addon edit form is rendered in the admin order form.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @return void
+	 */
+	public static function record_edit_in_order_render() {
+
+		// Bail early.
+		if ( ! class_exists( 'WC_Tracks' ) || ! class_exists( 'WC_Site_Tracking' ) || ! WC_Site_Tracking::is_tracking_enabled() ) {
+			return;
+		}
+
+		self::record_event( 'addon_edit_in_order_render' );
+	}
+
+	/**
+	 * Records a 'addon_edit_in_order_save' event in Tracks every time an order item with add-ons is edited in the admin order form.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @return void
+	 */
+	public static function record_edit_in_order_save() {
+
+		// Bail early.
+		if ( ! class_exists( 'WC_Tracks' ) || ! class_exists( 'WC_Site_Tracking' ) || ! WC_Site_Tracking::is_tracking_enabled() ) {
+			return;
+		}
+
+		self::record_event( 'addon_edit_in_order_save' );
 	}
 
 	/**

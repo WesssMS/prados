@@ -190,7 +190,7 @@ class WC_PAO_Core_Compatibility {
 	public static function is_wp_version_gt( $version ) {
 		if ( ! isset( self::$is_wp_version_gt[ $version ] ) ) {
 			global $wp_version;
-			self::$is_wp_version_gt[ $version ] = $wp_version && version_compare( WC_PB()->plugin_version( true, $wp_version ), $version, '>' );
+			self::$is_wp_version_gt[ $version ] = $wp_version && version_compare( WC_PAO()->plugin_version( true, $wp_version ), $version, '>' );
 		}
 		return self::$is_wp_version_gt[ $version ];
 	}
@@ -204,7 +204,7 @@ class WC_PAO_Core_Compatibility {
 	public static function is_wp_version_gte( $version ) {
 		if ( ! isset( self::$is_wp_version_gte[ $version ] ) ) {
 			global $wp_version;
-			self::$is_wp_version_gte[ $version ] = $wp_version && version_compare( WC_PB()->plugin_version( true, $wp_version ), $version, '>=' );
+			self::$is_wp_version_gte[ $version ] = $wp_version && version_compare( WC_PAO()->plugin_version( true, $wp_version ), $version, '>=' );
 		}
 		return self::$is_wp_version_gte[ $version ];
 	}
@@ -359,6 +359,100 @@ class WC_PAO_Core_Compatibility {
 	 */
 	public static function wc_current_theme_is_fse_theme() {
 		return function_exists( 'wc_current_theme_is_fse_theme' ) ? wc_current_theme_is_fse_theme() : false;
+	}
+
+	/**
+	 * Compatibility wrapper for 'rest_get_endpoint_args_for_schema' for WordPress core older than 5.6.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param array $schema
+	 * @param string $method
+	 *
+	 * @return array
+	 */
+	public static function rest_get_endpoint_args_for_schema( $schema, $method = WP_REST_Server::CREATABLE ) {
+		if ( self::is_wp_version_gte( '5.6.0' ) ) {
+			return \rest_get_endpoint_args_for_schema( $schema, $method );
+		} else {
+			// @see \rest_get_endpoint_args_for_schema
+			$schema_properties       = ! empty( $schema['properties'] ) ? $schema['properties'] : array();
+			$endpoint_args           = array();
+			$valid_schema_properties = array(
+				'title',
+				'description',
+				'default',
+				'type',
+				'format',
+				'enum',
+				'items',
+				'properties',
+				'additionalProperties',
+				'patternProperties',
+				'minProperties',
+				'maxProperties',
+				'minimum',
+				'maximum',
+				'exclusiveMinimum',
+				'exclusiveMaximum',
+				'multipleOf',
+				'minLength',
+				'maxLength',
+				'pattern',
+				'minItems',
+				'maxItems',
+				'uniqueItems',
+				'anyOf',
+				'oneOf',
+			);
+			$valid_schema_properties = array_diff( $valid_schema_properties, array( 'default', 'required' ) );
+
+			foreach ( $schema_properties as $field_id => $params ) {
+
+				// Arguments specified as `readonly` are not allowed to be set.
+				if ( ! empty( $params['readonly'] ) ) {
+					continue;
+				}
+
+				$endpoint_args[ $field_id ] = array(
+					'validate_callback' => 'rest_validate_request_arg',
+					'sanitize_callback' => 'rest_sanitize_request_arg',
+				);
+
+				if ( WP_REST_Server::CREATABLE === $method && isset( $params['default'] ) ) {
+					$endpoint_args[ $field_id ]['default'] = $params['default'];
+				}
+
+				if ( WP_REST_Server::CREATABLE === $method && ! empty( $params['required'] ) ) {
+					$endpoint_args[ $field_id ]['required'] = true;
+				}
+
+				foreach ( $valid_schema_properties as $schema_prop ) {
+					if ( isset( $params[ $schema_prop ] ) ) {
+						$endpoint_args[ $field_id ][ $schema_prop ] = $params[ $schema_prop ];
+					}
+				}
+
+				// Merge in any options provided by the schema property.
+				if ( isset( $params['arg_options'] ) ) {
+
+					// Only use required / default from arg_options on CREATABLE endpoints.
+					if ( WP_REST_Server::CREATABLE !== $method ) {
+						$params['arg_options'] = array_diff_key(
+							$params['arg_options'],
+							array(
+								'required' => '',
+								'default'  => '',
+							)
+						);
+					}
+
+					$endpoint_args[ $field_id ] = array_merge( $endpoint_args[ $field_id ], $params['arg_options'] );
+				}
+			}
+
+			return $endpoint_args;
+		}
 	}
 }
 

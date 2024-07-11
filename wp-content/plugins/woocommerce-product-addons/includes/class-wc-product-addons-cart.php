@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * WC_Product_Addons_Cart class.
  *
  * @class    WC_Product_Addons_Cart
- * @version  6.8.0
+ * @version  6.9.0
  */
 class WC_Product_Addons_Cart {
 	/**
@@ -46,9 +46,9 @@ class WC_Product_Addons_Cart {
 	/**
 	 * Validate add cart item. Note: Fires before add_cart_item_data.
 	 *
-	 * @param bool $passed     If passed validation.
-	 * @param int  $product_id Product ID.
-	 * @param int  $qty        Quantity.
+	 * @param  bool  $passed      If passed validation.
+	 * @param  int   $product_id  Product ID.
+	 * @param  int   $qty         Quantity.
 	 * @return bool
 	 */
 	public function validate_add_cart_item( $passed, $product_id, $qty, $post_data = null ) {
@@ -63,19 +63,19 @@ class WC_Product_Addons_Cart {
 
 			foreach ( $product_addons as $addon ) {
 				// If type is heading, skip.
-				if ( 'heading' === $addon['type'] ) {
+				if ( 'heading' === $addon[ 'type' ] ) {
 					continue;
 				}
 
-				$value = wp_unslash( isset( $post_data[ 'addon-' . $addon['field_name'] ] ) ? $post_data[ 'addon-' . $addon['field_name'] ] : '' );
+				$value = wp_unslash( isset( $post_data[ 'addon-' . $addon[ 'field_name' ] ] ) ? $post_data[ 'addon-' . $addon[ 'field_name' ] ] : '' );
 
-				switch ( $addon['type'] ) {
+				switch ( $addon[ 'type' ] ) {
 					case 'checkbox':
 						include_once dirname( __FILE__ ) . '/fields/class-wc-product-addons-field-list.php';
 						$field = new WC_Product_Addons_Field_List( $addon, $value );
 						break;
 					case 'multiple_choice':
-						switch ( $addon['display'] ) {
+						switch ( $addon[ 'display' ] ) {
 							case 'radiobutton':
 								include_once dirname( __FILE__ ) . '/fields/class-wc-product-addons-field-list.php';
 								$field = new WC_Product_Addons_Field_List( $addon, $value );
@@ -127,13 +127,13 @@ class WC_Product_Addons_Cart {
 	/**
 	 * Add cart item data action. Fires before add to cart action and add cart item filter.
 	 *
-	 * @param array $cart_item_data Cart item meta data.
-	 * @param int   $product_id     Product ID.
-	 * @param int   $variation_id
-	 * @param int   $quantity
-	 *
 	 * @throws Exception
 	 *
+	 * @param  int    $product_id      Product ID.
+	 * @param  int    $variation_id
+	 * @param  int    $quantity
+	 *
+	 * @param  array  $cart_item_data  Cart item meta data.
 	 * @return array
 	 */
 	public function add_cart_item_data( $cart_item_data, $product_id ) {
@@ -145,8 +145,8 @@ class WC_Product_Addons_Cart {
 
 		$product_addons = WC_Product_Addons_Helper::get_product_addons( $product_id );
 
-		if ( empty( $cart_item_data['addons'] ) ) {
-			$cart_item_data['addons'] = array();
+		if ( empty( $cart_item_data[ 'addons' ] ) ) {
+			$cart_item_data[ 'addons' ] = array();
 		}
 
 		if ( is_array( $product_addons ) && ! empty( $product_addons ) ) {
@@ -154,19 +154,19 @@ class WC_Product_Addons_Cart {
 
 			foreach ( $product_addons as $addon ) {
 				// If type is heading, skip.
-				if ( 'heading' === $addon['type'] ) {
+				if ( 'heading' === $addon[ 'type' ] ) {
 					continue;
 				}
 
-				$value = wp_unslash( isset( $post_data[ 'addon-' . $addon['field_name'] ] ) ? $post_data[ 'addon-' . $addon['field_name'] ] : '' );
+				$value = wp_unslash( isset( $post_data[ 'addon-' . $addon[ 'field_name' ] ] ) ? $post_data[ 'addon-' . $addon[ 'field_name' ] ] : '' );
 
-				switch ( $addon['type'] ) {
+				switch ( $addon[ 'type' ] ) {
 					case 'checkbox':
 						include_once dirname( __FILE__ ) . '/fields/class-wc-product-addons-field-list.php';
 						$field = new WC_Product_Addons_Field_List( $addon, $value );
 						break;
 					case 'multiple_choice':
-						switch ( $addon['display'] ) {
+						switch ( $addon[ 'display' ] ) {
 							case 'radiobutton':
 								include_once dirname( __FILE__ ) . '/fields/class-wc-product-addons-field-list.php';
 								$field = new WC_Product_Addons_Field_List( $addon, $value );
@@ -203,7 +203,7 @@ class WC_Product_Addons_Cart {
 					// Throw exception for add_to_cart to pickup.
 					throw new Exception( $data->get_error_message() );
 				} elseif ( $data ) {
-					$cart_item_data['addons'] = array_merge( $cart_item_data['addons'], apply_filters( 'woocommerce_product_addon_cart_item_data', $data, $addon, $product_id, $post_data ) );
+					$cart_item_data[ 'addons' ] = array_merge( $cart_item_data[ 'addons' ], apply_filters( 'woocommerce_product_addon_cart_item_data', $data, $addon, $product_id, $post_data ) );
 				}
 			}
 		}
@@ -214,19 +214,21 @@ class WC_Product_Addons_Cart {
 	/**
 	 * Include add-ons line item meta.
 	 *
-	 * @param  WC_Order_Item_Product $item          Order item data.
-	 * @param  string                $cart_item_key Cart item key.
-	 * @param  array                 $values        Order item values.
+	 * @param  WC_Order_Item_Product  $item           Order item data.
+	 * @param  string                 $cart_item_key  Cart item key.
+	 * @param  array                  $values         Order item values.
 	 */
 	public function order_line_item( $item, $cart_item_key, $values ) {
 
-		if ( ! empty( $values['addons'] ) ) {
+		if ( ! empty( $values[ 'addons' ] ) ) {
 
-			$ids = array();
+			$ids   = array();
+			$total = 0;
 
-			foreach ( $values['addons'] as $addon ) {
+			foreach ( $values[ 'addons' ] as $addon ) {
 				$value         = $addon[ 'value' ];
-				$price_type    = $addon['price_type'];
+				$raw_value     = $addon[ 'value' ];
+				$price_type    = $addon[ 'price_type' ];
 				$product       = $item->get_product();
 				$product_price = $product->get_price();
 
@@ -239,8 +241,8 @@ class WC_Product_Addons_Cart {
 				 * Create a clone of the current cart item and set its price equal to the add-on price.
 				 * This will allow extensions to discount the add-on price.
 				 */
-				$cloned_product = WC_Product_Addons_Helper::create_product_with_filtered_addon_prices( $values[ 'data' ], $addon[ 'price' ] );
-				$addon['price'] = $cloned_product->get_price();
+				$cloned_product   = WC_Product_Addons_Helper::create_product_with_filtered_addon_prices( $values[ 'data' ], $addon[ 'price' ] );
+				$addon[ 'price' ] = $cloned_product->get_price();
 
 				/*
 				 * Deprecated 'woocommerce_addons_add_price_to_name' since v6.4.0.
@@ -262,10 +264,10 @@ class WC_Product_Addons_Cart {
 				 * is nothing to calculate for percentage so
 				 * don't show any price.
 				 */
-				if ( $addon['price'] && 'percentage_based' === $price_type && 0 != $product_price ) {
-					$addon_price = $product_price * ( $addon['price'] / 100 );
+				if ( $addon[ 'price' ] && 'percentage_based' === $price_type && 0 != $product_price ) {
+					$addon_price = $product_price * ( $addon[ 'price' ] / 100 );
 				} else {
-					$addon_price = $addon['price'];
+					$addon_price = $addon[ 'price' ];
 				}
 
 				$prev_product = null;
@@ -292,21 +294,25 @@ class WC_Product_Addons_Cart {
 				 * If there is an add-on price, add the price of the add-on
 				 * to the selected option.
 				 */
-				if ( 'flat_fee' === $price_type && $addon['price'] && $add_price_to_value ) {
+				if ( 'flat_fee' === $price_type && $addon[ 'price' ] && $add_price_to_value ) {
 					/* translators: %1$s flat fee addon price in order */
 					$value .= sprintf( _x( ' (+ %1$s)', 'flat fee addon price in order', 'woocommerce-product-addons' ), $price );
-				} elseif ( ( 'quantity_based' === $price_type || 'percentage_based' === $price_type ) && $addon['price'] && $add_price_to_value ) {
+				} elseif ( ( 'quantity_based' === $price_type || 'percentage_based' === $price_type ) && $addon[ 'price' ] && $add_price_to_value ) {
 					/* translators: %1$s addon price in order */
 					$value .= sprintf( _x( ' (%1$s)', 'addon price in order', 'woocommerce-product-addons' ), $price );
-				} elseif ( 'custom_price' === $addon['field_type'] ) {
+				} elseif ( 'custom_price' === $addon[ 'field_type' ] ) {
 					/* translators: %1$s custom addon price in order */
-					$value = sprintf( _x( ' (%1$s)', 'custom addon price in order', 'woocommerce-product-addons' ), $price );
+					$value     = sprintf( _x( ' (%1$s)', 'custom addon price in order', 'woocommerce-product-addons' ), $price );
+					$raw_value = $addon_price;
 				}
 
 				$meta_data = [
 					'key'        => $addon[ 'name' ],
 					'value'      => $value,
-					'id'         => $addon[ 'id' ]
+					'id'         => $addon[ 'id' ],
+					'raw_value'  => $raw_value,
+					'raw_price'  => (float) $addon[ 'price' ],
+					'price_type' => $price_type,
 				];
 
 				// In case the add-on is a datepicker, save the offset and the timestamp for display transformations.
@@ -320,12 +326,19 @@ class WC_Product_Addons_Cart {
 
 				$meta_data = apply_filters( 'woocommerce_product_addons_order_line_item_meta', $meta_data, $addon, $item, $values );
 
-				$item->add_meta_data( $meta_data['key'], $meta_data['value'] );
+				$item->add_meta_data( $meta_data[ 'key' ], $meta_data[ 'value' ] );
 
 				$ids[] = $meta_data;
+
+				if ( 'quantity_based' === $price_type || 'percentage_based' === $price_type ) {
+					$addon_price = (float) $addon_price * $item->get_quantity();
+				}
+
+				$total += (float) $addon_price;
 			}
 
 			$item->add_meta_data( '_pao_ids', $ids );
+			$item->add_meta_data( '_pao_total', $total );
 		}
 	}
 
@@ -351,8 +364,8 @@ class WC_Product_Addons_Cart {
 
 		foreach ( $addons as $addon ) {
 			if ( isset( $addon[ 'timestamp' ] ) && isset( $addon[ 'offset' ] ) && $addon[ 'key' ] === $meta->key ) {
-				$converted_date = date_i18n( get_option( 'date_format' ), WC_Product_Addons_Helper::wc_pao_convert_timestamp_to_gmt_offset( (int) $addon[ 'timestamp' ], is_admin() ? null : -1 *  $addon[ 'offset' ] ) );
-				$display_value  = str_replace( $addon[ 'timestamp' ],$converted_date,$display_value );
+				$converted_date = date_i18n( get_option( 'date_format' ), WC_Product_Addons_Helper::wc_pao_convert_timestamp_to_gmt_offset( (int) $addon[ 'timestamp' ], is_admin() ? null : -1 * $addon[ 'offset' ] ) );
+				$display_value  = str_replace( $addon[ 'timestamp' ], $converted_date, $display_value );
 			}
 		}
 
@@ -363,13 +376,13 @@ class WC_Product_Addons_Cart {
 	 * Re-order.
 	 *
 	 * @since 3.0.0
-	 * @param array    $cart_item_meta Cart item data.
-	 * @param array    $item           Cart item.
-	 * @param WC_order $order          Order object.
+	 * @param  array     $cart_item_meta  Cart item data.
+	 * @param  array     $item            Cart item.
+	 * @param  WC_order  $order           Order object.
 	 *
 	 * @return array Cart item data
 	 */
-	public function re_add_cart_item_data( $cart_item_data, $item, $order ) {
+	public function re_add_cart_item_data( $cart_item_data, $item, $order = null ) {
 
 		// Disable validation.
 		remove_filter( 'woocommerce_add_to_cart_validation', array( $this, 'validate_add_cart_item' ), 999, 3 );
@@ -384,24 +397,24 @@ class WC_Product_Addons_Cart {
 		// Unlike renewals, WooCommerce Subscriptions doesn't grandfather item prices for initial payments.
 		// We need to remove the add-on data WooCommerce Subscriptions copied to the cart item data and re-add it to the cart item data.
 		if ( isset( $cart_item_data[ 'subscription_initial_payment' ][ 'custom_line_item_meta' ][ '_pao_ids' ] ) ) {
-			foreach ( $cart_item_data[ 'subscription_initial_payment' ]['custom_line_item_meta']['_pao_ids'] as $addon ) {
-				unset( $cart_item_data[ 'subscription_initial_payment' ]['custom_line_item_meta'][ $addon['key'] ] );
+			foreach ( $cart_item_data[ 'subscription_initial_payment' ][ 'custom_line_item_meta' ][ '_pao_ids' ] as $addon ) {
+				unset( $cart_item_data[ 'subscription_initial_payment' ][ 'custom_line_item_meta' ][ $addon[ 'key' ] ] );
 			}
 
-			unset( $cart_item_data[ 'subscription_initial_payment' ]['custom_line_item_meta']['_pao_ids'] );
+			unset( $cart_item_data[ 'subscription_initial_payment' ][ 'custom_line_item_meta' ][ '_pao_ids' ] );
 		}
 
 		// Get addon data.
-		$product_addons   = WC_Product_Addons_Helper::get_product_addons( $item['product_id'] );
-		$ids              = $item->get_meta( '_pao_ids', true );
+		$product_addons = WC_Product_Addons_Helper::get_product_addons( $item[ 'product_id' ] );
+		$ids            = $item->get_meta( '_pao_ids', true );
 
 		// Backwards compatibility for orders with Addons without ID.
 		if ( empty( $ids ) ) {
 			$ids = $item->get_meta_data();
 		}
 
-		if ( empty( $cart_item_data['addons'] ) ) {
-			$cart_item_data['addons'] = array();
+		if ( empty( $cart_item_data[ 'addons' ] ) ) {
+			$cart_item_data[ 'addons' ] = array();
 		}
 
 		if ( is_array( $product_addons ) && ! empty( $product_addons ) ) {
@@ -412,11 +425,11 @@ class WC_Product_Addons_Cart {
 				$field = '';
 
 				// If type is heading, skip.
-				if ( 'heading' === $addon['type'] ) {
+				if ( 'heading' === $addon[ 'type' ] ) {
 					continue;
 				}
 
-				switch ( $addon['type'] ) {
+				switch ( $addon[ 'type' ] ) {
 					case 'checkbox':
 						include_once WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/fields/class-wc-product-addons-field-list.php';
 
@@ -430,7 +443,7 @@ class WC_Product_Addons_Cart {
 						break;
 					case 'multiple_choice':
 						$value = array();
-						switch ( $addon['display'] ) {
+						switch ( $addon[ 'display' ] ) {
 							case 'radiobutton':
 								include_once WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/fields/class-wc-product-addons-field-list.php';
 
@@ -454,10 +467,10 @@ class WC_Product_Addons_Cart {
 
 								$loop = 0;
 
-								foreach ( $addon['options'] as $option ) {
+								foreach ( $addon[ 'options' ] as $option ) {
 									$loop++;
 
-									if ( sanitize_title( $option['label'] ) == $value ) {
+									if ( sanitize_title( $option[ 'label' ] ) == $value ) {
 										$value = $value . '-' . $loop;
 										break;
 									}
@@ -479,10 +492,10 @@ class WC_Product_Addons_Cart {
 
 						$loop = 0;
 
-						foreach ( $addon['options'] as $option ) {
+						foreach ( $addon[ 'options' ] as $option ) {
 							$loop++;
 
-							if ( sanitize_title( $option['label'] ) == $value ) {
+							if ( sanitize_title( $option[ 'label' ] ) == $value ) {
 								$value = $value . '-' . $loop;
 								break;
 							}
@@ -513,7 +526,7 @@ class WC_Product_Addons_Cart {
 							continue 2; // Skip to next addon in foreach loop.
 						}
 
-						$field = new WC_Product_Addons_Field_File_Upload( $addon, $value );
+						$field = new WC_Product_Addons_Field_File_Upload( $addon, $value, true );
 						break;
 					case 'datepicker':
 						include_once WC_PRODUCT_ADDONS_PLUGIN_PATH . '/includes/fields/class-wc-product-addons-field-datepicker.php';
@@ -547,7 +560,7 @@ class WC_Product_Addons_Cart {
 						// Get the post data.
 						$post_data = $_POST;
 
-						$cart_item_data['addons'] = array_merge( $cart_item_data['addons'], apply_filters( 'woocommerce_product_addon_reorder_cart_item_data', $data, $addon, $item['product_id'], $post_data ) );
+						$cart_item_data[ 'addons' ] = array_merge( $cart_item_data[ 'addons' ], apply_filters( 'woocommerce_product_addon_reorder_cart_item_data', $data, $addon, $item[ 'product_id' ], $post_data ) );
 					}
 				}
 			}
@@ -559,53 +572,53 @@ class WC_Product_Addons_Cart {
 	/**
 	 * Updates the product price based on the add-ons and the quantity.
 	 *
-	 * @param array $cart_item_data Cart item meta data.
-	 * @param int   $quantity       Quantity of products in that cart item.
-	 * @param array $prices         Array of prices for that product to use in
-	 *                              calculations.
+	 * @param  array  $cart_item_data  Cart item meta data.
+	 * @param  int    $quantity        Quantity of products in that cart item.
+	 * @param  array  $prices          Array of prices for that product to use in
+	 *                                 calculations.
 	 *
 	 * @return array
 	 */
 	public function update_product_price( $cart_item_data, $quantity, $prices ) {
-		if ( ! empty( $cart_item_data['addons'] ) && apply_filters( 'woocommerce_product_addons_adjust_price', true, $cart_item_data ) ) {
-			$price         = $prices['price'];
-			$regular_price = $prices['regular_price'];
-			$sale_price    = $prices['sale_price'];
+		if ( ! empty( $cart_item_data[ 'addons' ] ) && apply_filters( 'woocommerce_product_addons_adjust_price', true, $cart_item_data ) ) {
+			$price         = $prices[ 'price' ];
+			$regular_price = $prices[ 'regular_price' ];
+			$sale_price    = $prices[ 'sale_price' ];
 
 			// Compatibility with Smart Coupons self declared gift amount purchase.
-			if ( empty( $price ) && ! empty( $_POST['credit_called'] ) ) {
+			if ( empty( $price ) && ! empty( $_POST[ 'credit_called' ] ) ) {
 				// $_POST['credit_called'] is an array.
-				if ( isset( $_POST['credit_called'][ $cart_item_data['data']->get_id() ] ) ) {
-					$price         = (float) $_POST['credit_called'][ $cart_item_data['data']->get_id() ];
+				if ( isset( $_POST[ 'credit_called' ][ $cart_item_data[ 'data' ]->get_id() ] ) ) {
+					$price         = (float) $_POST[ 'credit_called' ][ $cart_item_data[ 'data' ]->get_id() ];
 					$regular_price = $price;
 					$sale_price    = $price;
 				}
 			}
 
-			if ( empty( $price ) && ! empty( $cart_item_data['credit_amount'] ) ) {
-				$price         = (float) $cart_item_data['credit_amount'];
+			if ( empty( $price ) && ! empty( $cart_item_data[ 'credit_amount' ] ) ) {
+				$price         = (float) $cart_item_data[ 'credit_amount' ];
 				$regular_price = $price;
 				$sale_price    = $price;
 			}
 
 			// Save the price before price type calculations to be used later.
-			$cart_item_data['addons_price_before_calc']         = (float) $price;
-			$cart_item_data['addons_regular_price_before_calc'] = (float) $regular_price;
-			$cart_item_data['addons_sale_price_before_calc']    = (float) $sale_price;
-			$cart_item_data[ 'addons_flat_fees_sum' ]           = 0;
+			$cart_item_data[ 'addons_price_before_calc' ]         = (float) $price;
+			$cart_item_data[ 'addons_regular_price_before_calc' ] = (float) $regular_price;
+			$cart_item_data[ 'addons_sale_price_before_calc' ]    = (float) $sale_price;
+			$cart_item_data[ 'addons_flat_fees_sum' ]             = 0;
 
-			foreach ( $cart_item_data['addons'] as $addon ) {
-				$price_type  = $addon['price_type'];
-				$addon_price = $addon['price'];
+			foreach ( $cart_item_data[ 'addons' ] as $addon ) {
+				$price_type  = $addon[ 'price_type' ];
+				$addon_price = $addon[ 'price' ];
 
 				switch ( $price_type ) {
 					case 'percentage_based':
-						$price         += (float) ( $cart_item_data['addons_price_before_calc'] * ( $addon_price / 100 ) );
-						$regular_price += (float) ( $cart_item_data['addons_regular_price_before_calc'] * ( $addon_price / 100 ) );
-						$sale_price    += (float) ( $cart_item_data['addons_sale_price_before_calc'] * ( $addon_price / 100 ) );
+						$price         += (float) ( $cart_item_data[ 'addons_price_before_calc' ] * ( $addon_price / 100 ) );
+						$regular_price += (float) ( $cart_item_data[ 'addons_regular_price_before_calc' ] * ( $addon_price / 100 ) );
+						$sale_price    += (float) ( $cart_item_data[ 'addons_sale_price_before_calc' ] * ( $addon_price / 100 ) );
 						break;
 					case 'flat_fee':
-						$flat_fee = $quantity > 0 ? (float) ( $addon_price / $quantity ) : 0;
+						$flat_fee                                 = $quantity > 0 ? (float) ( $addon_price / $quantity ) : 0;
 						$price                                    += $flat_fee;
 						$regular_price                            += $flat_fee;
 						$sale_price                               += $flat_fee;
@@ -626,18 +639,18 @@ class WC_Product_Addons_Cart {
 			];
 			$updated_product_prices = apply_filters( 'woocommerce_product_addons_update_product_price', $updated_product_prices, $cart_item_data, $prices );
 
-			$cart_item_data['data']->set_price( $updated_product_prices['price'] );
+			$cart_item_data[ 'data' ]->set_price( $updated_product_prices[ 'price' ] );
 
 			// Only update regular price if it was defined.
-			$has_regular_price = is_numeric( $cart_item_data['data']->get_regular_price( 'edit' ) );
+			$has_regular_price = is_numeric( $cart_item_data[ 'data' ]->get_regular_price( 'edit' ) );
 			if ( $has_regular_price ) {
-				$cart_item_data['data']->set_regular_price( $updated_product_prices['regular_price'] );
+				$cart_item_data[ 'data' ]->set_regular_price( $updated_product_prices[ 'regular_price' ] );
 			}
 
 			// Only update sale price if it was defined.
-			$has_sale_price = is_numeric( $cart_item_data['data']->get_sale_price( 'edit' ) );
+			$has_sale_price = is_numeric( $cart_item_data[ 'data' ]->get_sale_price( 'edit' ) );
 			if ( $has_sale_price ) {
-				$cart_item_data['data']->set_sale_price( $updated_product_prices['sale_price'] );
+				$cart_item_data[ 'data' ]->set_sale_price( $updated_product_prices[ 'sale_price' ] );
 			}
 		}
 
@@ -648,38 +661,38 @@ class WC_Product_Addons_Cart {
 	 * Add cart item. Fires after add cart item data filter.
 	 *
 	 * @since 3.0.0
-	 * @param array $cart_item_data Cart item meta data.
+	 * @param  array  $cart_item_data  Cart item meta data.
 	 *
 	 * @return array
 	 */
 	public function add_cart_item( $cart_item_data ) {
 		$prices = array(
-			'price'         => (float) $cart_item_data['data']->get_price( 'edit' ),
-			'regular_price' => (float) $cart_item_data['data']->get_regular_price( 'edit' ),
-			'sale_price'    => (float) $cart_item_data['data']->get_sale_price( 'edit' ),
+			'price'         => (float) $cart_item_data[ 'data' ]->get_price( 'edit' ),
+			'regular_price' => (float) $cart_item_data[ 'data' ]->get_regular_price( 'edit' ),
+			'sale_price'    => (float) $cart_item_data[ 'data' ]->get_sale_price( 'edit' ),
 		);
 
-		return $this->update_product_price( $cart_item_data, $cart_item_data['quantity'], $prices );
+		return $this->update_product_price( $cart_item_data, $cart_item_data[ 'quantity' ], $prices );
 	}
 
 	/**
 	 * Update cart item quantity.
 	 *
-	 * @param array    $cart_item_key Cart item key.
-	 * @param integer  $quantity      New quantity of the product.
-	 * @param integer  $old_quantity  Old quantity of the product.
-	 * @param \WC_Cart $cart          WC Cart object.
+	 * @param  array     $cart_item_key  Cart item key.
+	 * @param  integer   $quantity       New quantity of the product.
+	 * @param  integer   $old_quantity   Old quantity of the product.
+	 * @param  \WC_Cart  $cart           WC Cart object.
 	 *
 	 * @return array
 	 */
 	public function update_price_on_quantity_update( $cart_item_key, $quantity, $old_quantity, $cart ) {
 		$cart_item_data = $cart->get_cart_item( $cart_item_key );
 
-		if ( ! empty( $cart_item_data['addons'] ) ) {
+		if ( ! empty( $cart_item_data[ 'addons' ] ) ) {
 			$prices = array(
-				'price'         => $cart_item_data['addons_price_before_calc'],
-				'regular_price' => $cart_item_data['addons_regular_price_before_calc'],
-				'sale_price'    => $cart_item_data['addons_sale_price_before_calc'],
+				'price'         => $cart_item_data[ 'addons_price_before_calc' ],
+				'regular_price' => $cart_item_data[ 'addons_regular_price_before_calc' ],
+				'sale_price'    => $cart_item_data[ 'addons_sale_price_before_calc' ],
 			);
 
 			// Set new cart item data, when cart item quantity changes.
@@ -693,19 +706,19 @@ class WC_Product_Addons_Cart {
 	/**
 	 * Get cart item from session.
 	 *
-	 * @param array $cart_item Cart item data.
-	 * @param array $values    Cart item values.
+	 * @param  array  $cart_item  Cart item data.
+	 * @param  array  $values     Cart item values.
 	 * @return array
 	 */
 	public function get_cart_item_from_session( $cart_item, $values ) {
-		if ( ! empty( $values['addons'] ) ) {
-			$prices              = array(
-				'price'         => (float) $cart_item['data']->get_price( 'edit' ),
-				'regular_price' => (float) $cart_item['data']->get_regular_price( 'edit' ),
-				'sale_price'    => (float) $cart_item['data']->get_sale_price( 'edit' ),
+		if ( ! empty( $values[ 'addons' ] ) ) {
+			$prices                = array(
+				'price'         => (float) $cart_item[ 'data' ]->get_price( 'edit' ),
+				'regular_price' => (float) $cart_item[ 'data' ]->get_regular_price( 'edit' ),
+				'sale_price'    => (float) $cart_item[ 'data' ]->get_sale_price( 'edit' ),
 			);
-			$cart_item['addons'] = $values['addons'];
-			$cart_item           = $this->update_product_price( $cart_item, $cart_item['quantity'], $prices );
+			$cart_item[ 'addons' ] = $values[ 'addons' ];
+			$cart_item             = $this->update_product_price( $cart_item, $cart_item[ 'quantity' ], $prices );
 		}
 
 		return $cart_item;
@@ -714,13 +727,13 @@ class WC_Product_Addons_Cart {
 	/**
 	 * Get item data.
 	 *
-	 * @param array $other_data Other data.
-	 * @param array $cart_item  Cart item data.
+	 * @param  array  $other_data  Other data.
+	 * @param  array  $cart_item   Cart item data.
 	 * @return array
 	 */
 	public function get_item_data( $other_data, $cart_item ) {
-		if ( ! empty( $cart_item['addons'] ) ) {
-			foreach ( $cart_item['addons'] as $addon ) {
+		if ( ! empty( $cart_item[ 'addons' ] ) ) {
+			foreach ( $cart_item[ 'addons' ] as $addon ) {
 
 				$price = isset( $cart_item[ 'addons_price_before_calc' ] ) ? $cart_item[ 'addons_price_before_calc' ] : $addon[ 'price' ];
 				$value = $addon[ 'value' ];
@@ -753,34 +766,34 @@ class WC_Product_Addons_Cart {
 
 				$GLOBALS[ 'product' ] = $cloned_cart_item;
 
-				if ( 0 == $addon['price'] ) {
+				if ( 0 == $addon[ 'price' ] ) {
 					$value .= '';
-				} elseif ( 'percentage_based' === $addon['price_type'] && 0 == $price ) {
+				} elseif ( 'percentage_based' === $addon[ 'price_type' ] && 0 == $price ) {
 					$value .= '';
-				} elseif ( 'flat_fee' === $addon['price_type'] && $addon['price'] ) {
+				} elseif ( 'flat_fee' === $addon[ 'price_type' ] && $addon[ 'price' ] ) {
 
 					$addon_price = wc_price( WC_Product_Addons_Helper::get_product_addon_price_for_display( $addon[ 'price' ], $cart_item[ 'data' ], true ) );
 					/* translators: %1$s flat fee addon price in cart */
-					$value      .= sprintf( _x( ' (+ %1$s)', 'flat fee addon price in cart', 'woocommerce-product-addons' ), $addon_price );
+					$value .= sprintf( _x( ' (+ %1$s)', 'flat fee addon price in cart', 'woocommerce-product-addons' ), $addon_price );
 
-				}  elseif ( 'custom_price' === $addon['field_type'] && $addon['price'] ) {
+				} elseif ( 'custom_price' === $addon[ 'field_type' ] && $addon[ 'price' ] ) {
 
-					$addon_price        = wc_price( WC_Product_Addons_Helper::get_product_addon_price_for_display( $addon[ 'price' ], $cart_item[ 'data' ], true ) );
+					$addon_price = wc_price( WC_Product_Addons_Helper::get_product_addon_price_for_display( $addon[ 'price' ], $cart_item[ 'data' ], true ) );
 					/* translators: %1$s custom addon price in cart */
-					$value             .= sprintf( _x( ' (%1$s)', 'custom price addon price in cart', 'woocommerce-product-addons' ), $addon_price );
+					$value              .= sprintf( _x( ' (%1$s)', 'custom price addon price in cart', 'woocommerce-product-addons' ), $addon_price );
 					$addon[ 'display' ] = $value;
-				} elseif ( 'quantity_based' === $addon['price_type'] && $addon['price'] && $add_price_to_value ) {
+				} elseif ( 'quantity_based' === $addon[ 'price_type' ] && $addon[ 'price' ] && $add_price_to_value ) {
 					$addon_price = wc_price( WC_Product_Addons_Helper::get_product_addon_price_for_display( $addon[ 'price' ], $cart_item[ 'data' ], true ) );
 					/* translators: %1$s quantity based addon price in cart */
-					$value      .= sprintf( _x( ' (%1$s)', 'quantity based addon price in cart', 'woocommerce-product-addons' ), $addon_price );
+					$value .= sprintf( _x( ' (%1$s)', 'quantity based addon price in cart', 'woocommerce-product-addons' ), $addon_price );
 
-				} elseif ( 'percentage_based' === $addon['price_type'] && $addon['price'] && $add_price_to_value ) {
+				} elseif ( 'percentage_based' === $addon[ 'price_type' ] && $addon[ 'price' ] && $add_price_to_value ) {
 
-					$_product = wc_get_product( $cart_item['product_id'] );
-					$_product->set_price( $price * ( $addon['price'] / 100 ) );
+					$_product = wc_get_product( $cart_item[ 'product_id' ] );
+					$_product->set_price( $price * ( $addon[ 'price' ] / 100 ) );
 					$addon_price = WC()->cart->get_product_price( $_product );
 					/* translators: %1$s percentage based addon price in cart */
-					$value      .= sprintf( _x( ' (%1$s)', 'percentage based addon price in cart', 'woocommerce-product-addons' ), $addon_price );
+					$value .= sprintf( _x( ' (%1$s)', 'percentage based addon price in cart', 'woocommerce-product-addons' ), $addon_price );
 				}
 
 				if ( ! is_null( $prev_product ) ) {
@@ -789,10 +802,10 @@ class WC_Product_Addons_Cart {
 					unset( $GLOBALS[ 'product' ] );
 				}
 
-				$addon_data = array(
-					'name'    => $addon['name'],
+				$addon_data   = array(
+					'name'    => $addon[ 'name' ],
 					'value'   => $value,
-					'display' => isset( $addon['display'] ) ? $addon['display'] : '',
+					'display' => isset( $addon[ 'display' ] ) ? $addon[ 'display' ] : '',
 				);
 				$other_data[] = apply_filters( 'woocommerce_product_addons_get_item_data', $addon_data, $addon, $cart_item );
 			}
@@ -802,11 +815,26 @@ class WC_Product_Addons_Cart {
 	}
 
 	/**
+	 * This gets the value for an add-on while considering backward compatibility for orders created before the `raw_value` field addition.
+	 *
+	 * @since 6.9.0
+	 * @param  array|object  $meta  Meta data.
+	 * @return mixed
+	 */
+	private function extract_meta_value( $meta ) {
+		if ( is_object( $meta ) ) {
+			return $meta->raw_value ?? $meta->value;
+		}
+
+		return $meta[ 'raw_value' ] ?? $meta[ 'value' ];
+	}
+
+	/**
 	 * Grabs the value of a product addon from order item meta.
 	 *
-	 * @param array  $ids Array of addon meta that include id, name and value.
-	 * @param array  $addon
-	 * @param string $type Addon type.
+	 * @param  array   $ids   Array of addon meta that include id, name and value.
+	 * @param  array   $addon
+	 * @param  string  $type  Addon type.
 	 * @return array
 	 */
 	public function get_addon_meta_value( $ids, $addon, $type ) {
@@ -815,7 +843,7 @@ class WC_Product_Addons_Cart {
 		if ( 'checkbox' === $type || 'radiobutton' === $type ) {
 			foreach ( $ids as $meta ) {
 				if ( $this->is_matching_addon( $addon, $meta ) ) {
-					$meta_value = is_object( $meta ) ? $meta->value : $meta[ 'value' ];
+					$meta_value = $this->extract_meta_value( $meta );
 					if ( is_array( $meta_value ) && ! empty( $meta_value ) ) {
 						$value[] = array_map( 'sanitize_title', $meta_value );
 					} else {
@@ -823,19 +851,19 @@ class WC_Product_Addons_Cart {
 					}
 				}
 			}
-		} elseif( 'select' === $type ) {
+		} elseif ( 'select' === $type ) {
 			foreach ( $ids as $meta ) {
 				if ( $this->is_matching_addon( $addon, $meta ) ) {
-					$meta_value = is_object( $meta ) ? $meta->value : $meta[ 'value' ];
+					$meta_value = $this->extract_meta_value( $meta );
 					$value      = sanitize_title( $meta_value );
 					break;
 				}
 			}
-		} elseif( 'datepicker' === $type ) {
+		} elseif ( 'datepicker' === $type ) {
 			foreach ( $ids as $meta ) {
 				if ( $this->is_matching_addon( $addon, $meta ) ) {
-					$meta_value     = is_object( $meta ) ? $meta->value : $meta[ 'value' ];
-					$converted_date = date_i18n( get_option( 'date_format' ), WC_Product_Addons_Helper::wc_pao_convert_timestamp_to_gmt_offset( (int) $meta[ 'timestamp' ], is_admin() ? null : - 1 * $meta[ 'offset' ] ) );
+					$meta_value     = $this->extract_meta_value( $meta );
+					$converted_date = date_i18n( get_option( 'date_format' ), WC_Product_Addons_Helper::wc_pao_convert_timestamp_to_gmt_offset( (int) $meta[ 'timestamp' ], is_admin() ? null : -1 * $meta[ 'offset' ] ) );
 					$display_value  = str_replace( $meta_value, $converted_date, $meta_value );
 					$value          = sanitize_title( $display_value );
 					break;
@@ -844,7 +872,7 @@ class WC_Product_Addons_Cart {
 		} else {
 			foreach ( $ids as $meta ) {
 				if ( $this->is_matching_addon( $addon, $meta ) ) {
-					$meta_value = is_object( $meta ) ? $meta->value : $meta[ 'value' ];
+					$meta_value = $this->extract_meta_value( $meta );
 					$value      = wc_clean( $meta_value );
 					break;
 				}
@@ -857,8 +885,8 @@ class WC_Product_Addons_Cart {
 	/**
 	 * Checks if an order item addon meta matches a product level addon.
 	 *
-	 * @param array  $addon
-	 * @param array|object  $meta
+	 * @param  array         $addon
+	 * @param  array|object  $meta
 	 * @return boolean
 	 */
 	public function is_matching_addon( $addon, $meta ) {
@@ -869,11 +897,11 @@ class WC_Product_Addons_Cart {
 			&& isset( $meta[ 'id' ] )
 			&& 0 !== $addon[ 'id' ]
 			&& 0 !== $meta[ 'id' ] ) {
-			$match = $addon[ 'id' ] === $meta[ 'id' ] && stripos( $meta[ 'key' ], $addon['name'] ) === 0;
+			$match = $addon[ 'id' ] === $meta[ 'id' ] && stripos( $meta[ 'key' ], $addon[ 'name' ] ) === 0;
 		} else {
 			// Backwards compatibility for addons without ID.
 			$meta_key = is_object( $meta ) ? $meta->key : $meta[ 'key' ];
-			$match    = stripos( $meta_key, $addon['name'] ) === 0;
+			$match    = stripos( $meta_key, $addon[ 'name' ] ) === 0;
 		}
 
 		return $match;
@@ -882,7 +910,7 @@ class WC_Product_Addons_Cart {
 	/**
 	 * Checks if the added product is a grouped product.
 	 *
-	 * @param int $product_id Product ID.
+	 * @param  int  $product_id  Product ID.
 	 * @return bool
 	 */
 	public function is_grouped_product( $product_id ) {
